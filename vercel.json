@@ -6,7 +6,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": ".",
+      "src": "index.html",
       "use": "@vercel/static"
     }
   ],
@@ -14,10 +14,6 @@
     {
       "src": "/api/dialogflow",
       "dest": "/api/dialogflow"
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/health"
     },
     {
       "src": "/(.*)",
