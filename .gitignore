@@ -7,6 +7,8 @@
 *.json
 !package.json
 !package-lock.json
+!querybee-key.json
+!vercel.json
 
 # Node modules
 node_modules/

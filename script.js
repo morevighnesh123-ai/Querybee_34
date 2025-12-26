@@ -50,14 +50,25 @@ document.addEventListener("DOMContentLoaded", () => {
   let isConnected = false;
   let connectionCheckInterval = null;
 
-  // Check backend connection status
-  async function checkConnectionStatus() {
+  // API base URL - use relative path for both dev and production
+  const API_BASE = '/api';
+
+  async function callDialogflowBackend(query) {
+    const session = initializeSession();
+    const url = `${API_BASE}/dialogflow`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     try {
-      const response = await fetch('http://localhost:3000', {
-        method: 'GET',
-        timeout: 3000
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query, session }),
+        signal: controller.signal
       });
-      
+
       if (response.ok) {
         isConnected = true;
         statusDot.classList.remove('disconnected');
