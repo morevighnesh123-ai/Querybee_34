@@ -20,12 +20,19 @@ async function getAccessToken() {
   }
   
   if (!authClientPromise) {
-    const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    if (!keyFile) {
+    const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (!envCreds) {
       throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable not set');
     }
+    let credentials;
+    if (envCreds.trim().startsWith('{')) {
+      credentials = JSON.parse(envCreds.trim());
+      console.log('Using GOOGLE_APPLICATION_CREDENTIALS as JSON object');
+    } else {
+      throw new Error('GOOGLE_APPLICATION_CREDENTIALS must be a JSON object string on Vercel');
+    }
     const auth = new GoogleAuth({
-      keyFile,
+      credentials,
       scopes: ['https://www.googleapis.com/auth/cloud-platform']
     });
     authClientPromise = auth.getClient();
