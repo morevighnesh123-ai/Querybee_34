@@ -487,6 +487,12 @@ app.listen(port, () => {
   console.log('');
 });
 // Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Vercel serverless function export
+module.exports = app;
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
