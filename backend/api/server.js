@@ -52,12 +52,17 @@ async function getAccessToken() {
 // Vercel helper: if GOOGLE_APPLICATION_CREDENTIALS is a JSON string, write to temp file for GoogleAuth
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS.trim();
+  console.log('GOOGLE_APPLICATION_CREDENTIALS starts with {:', envCreds.startsWith('{'));
   if (envCreds.startsWith('{')) {
     const tmpPath = path.join(os.tmpdir(), 'querybee-service-account.json');
     fs.writeFileSync(tmpPath, envCreds, 'utf8');
     process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
     console.log('Wrote service-account JSON from env var to temp file:', tmpPath);
+  } else {
+    console.log('GOOGLE_APPLICATION_CREDENTIALS is a file path:', envCreds);
   }
+} else {
+  console.log('GOOGLE_APPLICATION_CREDENTIALS not set');
 }
 
 const app = express();
