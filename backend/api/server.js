@@ -117,8 +117,8 @@ app.post('/api/dialogflow', async (req, res) => {
     }
 
     const accessToken = ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0
-  ? ACCESS_TOKEN.trim()
-  : await getAccessToken();
+  ? (() => { console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'); return ACCESS_TOKEN.trim(); })()
+  : (() => { console.log('Falling back to auto-generated token from service account'); return getAccessToken(); })();
 
     const dialogflowUrl = `https://dialogflow.googleapis.com/v2beta1/projects/${PROJECT_ID}/agent/sessions/${sessionId}:detectIntent`;
     const kbPath = `projects/${PROJECT_ID}/knowledgeBases/${KNOWLEDGE_BASE_ID}`;
