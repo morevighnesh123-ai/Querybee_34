@@ -50,25 +50,28 @@ document.addEventListener("DOMContentLoaded", () => {
   let isConnected = false;
   let connectionCheckInterval = null;
 
-  // API base URL - use relative path for both dev and production
-  const API_BASE = '/api';
+  // Mobile menu toggle
+  window.toggleMobileMenu = function() {
+    const mainMenu = document.querySelector('.main-menu');
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (mainMenu.classList.contains('active')) {
+      mainMenu.classList.remove('active');
+      mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    } else {
+      mainMenu.classList.add('active');
+      mobileToggle.innerHTML = '<i class="fas fa-times"></i>';
+    }
+  };
 
-  async function callDialogflowBackend(query) {
-    const session = initializeSession();
-    const url = `${API_BASE}/dialogflow`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
+  // Check backend connection status
+  async function checkConnectionStatus() {
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query, session }),
-        signal: controller.signal
+      const response = await fetch('http://localhost:3000', {
+        method: 'GET',
+        timeout: 3000
       });
-
+      
       if (response.ok) {
         isConnected = true;
         statusDot.classList.remove('disconnected');
@@ -472,6 +475,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Add touch support for mobile dragging
+  chatToggle.addEventListener("touchstart", (e) => {
+    if (!isOpen) {
+      startWidgetDrag(e.touches[0]);
+    }
+  }, { passive: true });
+
+  chatWidget.addEventListener("touchmove", (e) => {
+    if (!isOpen && isDragging) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent('mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      document.dispatchEvent(mouseEvent);
+    }
+  }, { passive: false });
+
+  chatWidget.addEventListener("touchend", (e) => {
+    if (!isOpen && isDragging) {
+      const mouseEvent = new MouseEvent('mouseup');
+      document.dispatchEvent(mouseEvent);
+    }
+  }, { passive: true });
+
   // Close button handler
   closeBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -544,19 +573,16 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (isOpen) {
           updateChatPosition();
-          constrainToViewport();
         }
       }
     };
 
     const handleMouseUp = () => {
-      if (isDragging) {
-        savePosition();
-        chatToggle.classList.remove("dragging");
-        chatWidget.classList.remove("dragging");
-        document.body.classList.remove("no-select");
-      }
       isDragging = false;
+      chatToggle.classList.remove("dragging");
+      chatWidget.classList.remove("dragging");
+      document.body.classList.remove("no-select");
+      savePosition();
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
