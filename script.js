@@ -184,18 +184,113 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Enhanced boundary enforcement - prevent any overflow
-    const maxLeft = window.innerWidth - widgetRect.width - padding;
-    const maxTop = window.innerHeight - widgetRect.height - padding;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const maxLeft = viewportWidth - widgetRect.width - padding;
+    const maxTop = viewportHeight - widgetRect.height - padding;
     
     // Ensure widget stays within strict boundaries
-    left = Math.min(Math.max(left, padding), Math.max(padding, maxLeft));
-    top = Math.min(Math.max(top, padding), Math.max(padding, maxTop));
+    left = Math.max(padding, Math.min(left, maxLeft));
+    top = Math.max(padding, Math.min(top, maxTop));
     
     chatWidget.style.left = left + "px";
     chatWidget.style.top = top + "px";
     chatWidget.style.right = "auto";
     chatWidget.style.bottom = "auto";
     currentPosition = { x: left, y: top };
+    
+    // Also constrain the chat container if open
+    if (isOpen) {
+      constrainChatContainerToViewport();
+    }
+  }
+
+  // Enhanced chat container boundary enforcement
+  function constrainChatContainerToViewport() {
+    const containerRect = chatContainer.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const padding = 15;
+    
+    let needsAdjustment = false;
+    
+    // Check horizontal boundaries
+    if (containerRect.left < padding) {
+      chatContainer.style.left = padding + "px";
+      chatContainer.style.right = "auto";
+      chatContainer.style.transform = "none";
+      needsAdjustment = true;
+    } else if (containerRect.right > viewportWidth - padding) {
+      const overflow = containerRect.right - (viewportWidth - padding);
+      if (chatContainer.style.right !== undefined && chatContainer.style.right !== "auto") {
+        const currentRight = parseInt(chatContainer.style.right) || 0;
+        chatContainer.style.right = Math.max(0, currentRight + overflow) + "px";
+      } else {
+        const currentLeft = parseInt(chatContainer.style.left) || 0;
+        chatContainer.style.left = Math.max(padding, currentLeft - overflow) + "px";
+      }
+      needsAdjustment = true;
+    }
+    
+    // Check vertical boundaries
+    if (containerRect.top < padding) {
+      chatContainer.style.top = padding + "px";
+      chatContainer.style.bottom = "auto";
+      chatContainer.style.transform = "none";
+      needsAdjustment = true;
+    } else if (containerRect.bottom > viewportHeight - padding) {
+      const overflow = containerRect.bottom - (viewportHeight - padding);
+      if (chatContainer.style.bottom !== undefined && chatContainer.style.bottom !== "auto") {
+        const currentBottom = parseInt(chatContainer.style.bottom) || 0;
+        chatContainer.style.bottom = Math.max(0, currentBottom + overflow) + "px";
+      } else {
+        const currentTop = parseInt(chatContainer.style.top) || 0;
+        chatContainer.style.top = Math.max(padding, currentTop - overflow) + "px";
+      }
+      needsAdjustment = true;
+    }
+    
+    // Adjust chat icon position if container overlaps with it
+    if (needsAdjustment) {
+      adjustChatIconPosition();
+    }
+  }
+
+  // Adjust chat icon position to stay visible when container opens
+  function adjustChatIconPosition() {
+    const toggleRect = chatToggle.getBoundingClientRect();
+    const containerRect = chatContainer.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const padding = 10;
+    
+    // Check if toggle overlaps with container and adjust if needed
+    const toggleCenterX = toggleRect.left + toggleRect.width / 2;
+    const toggleCenterY = toggleRect.top + toggleRect.height / 2;
+    
+    // Horizontal adjustment
+    if (toggleCenterX >= containerRect.left && toggleCenterX <= containerRect.right) {
+      // Toggle is horizontally aligned with container, shift it
+      if (containerRect.left > padding) {
+        chatWidget.style.left = (containerRect.left - toggleRect.width - 10) + "px";
+      } else {
+        chatWidget.style.left = (containerRect.right + 10) + "px";
+      }
+      chatWidget.style.right = "auto";
+      currentPosition.x = parseFloat(chatWidget.style.left);
+    }
+    
+    // Vertical adjustment
+    if (toggleCenterY >= containerRect.top && toggleCenterY <= containerRect.bottom) {
+      // Toggle is vertically aligned with container, shift it
+      if (containerRect.top > padding) {
+        chatWidget.style.top = (containerRect.top - toggleRect.height - 10) + "px";
+      } else {
+        chatWidget.style.top = (containerRect.bottom + 10) + "px";
+      }
+      chatWidget.style.bottom = "auto";
+      currentPosition.y = parseFloat(chatWidget.style.top);
+    }
   }
 
   // Save position to localStorage
@@ -279,8 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const defaultHeight = Math.min(560, viewportHeight * 0.75);
     const minWidth = 320;
     const minHeight = 450;
-    const padding = 25; // Strict padding for chatbox boundaries
-    const gap = 15; // Gap between toggle and container
+    const padding = 15; // Consistent padding for boundaries
+    const gap = 10; // Gap between toggle and container
     
     // Calculate available space from toggle position
     const spaceRight = viewportWidth - widgetRect.right;
@@ -314,10 +409,18 @@ document.addEventListener("DOMContentLoaded", () => {
       // Force positioning to the side with more space
       if (spaceRight > spaceLeft) {
         positionRight = true;
+        // Use transform to shift left if needed
+        const overflow = (widgetRect.right + containerWidth) - (viewportWidth - padding);
+        if (overflow > 0) {
+          chatContainer.style.transform = `translateX(-${overflow}px)`;
+        } else {
+          chatContainer.style.transform = "none";
+        }
       } else {
         positionRight = false;
         chatContainer.style.right = "auto";
         chatContainer.style.left = "0";
+        chatContainer.style.transform = "none";
       }
     }
     
@@ -350,6 +453,22 @@ document.addEventListener("DOMContentLoaded", () => {
       chatContainer.style.top = "auto";
     }
     
+    // Mobile responsive adjustments
+    if (viewportWidth <= 768) {
+      // On mobile, take full width with minimal padding
+      const mobilePadding = 10;
+      chatContainer.style.width = (viewportWidth - mobilePadding * 2) + "px";
+      chatContainer.style.maxWidth = (viewportWidth - mobilePadding * 2) + "px";
+      chatContainer.style.left = mobilePadding + "px";
+      chatContainer.style.right = "auto";
+      chatContainer.style.transform = "none";
+      
+      // Adjust height for mobile
+      const mobileHeight = Math.min(defaultHeight, viewportHeight * 0.7);
+      chatContainer.style.height = mobileHeight + "px";
+      chatContainer.style.maxHeight = mobileHeight + "px";
+    }
+    
     // Strict boundary enforcement - prevent any overflow
     requestAnimationFrame(() => {
       const containerRect = chatContainer.getBoundingClientRect();
@@ -358,6 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (containerRect.left < padding) {
         chatContainer.style.left = padding + "px";
         chatContainer.style.right = "auto";
+        chatContainer.style.transform = "none";
         // Force width adjustment if needed
         const availableWidth = viewportWidth - (padding * 2);
         if (containerWidth > availableWidth) {
@@ -387,6 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (containerRect.top < padding) {
         chatContainer.style.top = padding + "px";
         chatContainer.style.bottom = "auto";
+        chatContainer.style.transform = "none";
         // Force height adjustment if needed
         const availableHeight = viewportHeight - (padding * 2);
         if (containerHeight > availableHeight) {
@@ -573,6 +694,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (isOpen) {
           updateChatPosition();
+          constrainToViewport(); // Ensure container stays within bounds during drag
         }
       }
     };
@@ -583,6 +705,9 @@ document.addEventListener("DOMContentLoaded", () => {
       chatWidget.classList.remove("dragging");
       document.body.classList.remove("no-select");
       savePosition();
+      if (isOpen) {
+        constrainToViewport(); // Ensure final position is within bounds
+      }
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
@@ -684,137 +809,130 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Enhanced resize functionality with strict boundary enforcement
-  resizeHandle.addEventListener("mousedown", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    isResizing = true;
-    chatContainer.classList.add("resizing");
-    
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = chatContainer.offsetWidth;
-    const startHeight = chatContainer.offsetHeight;
-    const startLeft = chatContainer.getBoundingClientRect().left;
-    const startTop = chatContainer.getBoundingClientRect().top;
-    const widgetRect = chatWidget.getBoundingClientRect();
-    
-    // Create resize overlay for better UX
-    const resizeOverlay = document.createElement('div');
-    resizeOverlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.1);
-      z-index: 10000;
-      cursor: nwse-resize;
-    `;
-    document.body.appendChild(resizeOverlay);
-    
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = "nwse-resize";
-    
-    const handleMouseMove = (e) => {
-      if (!isResizing) return;
+  // Enhanced resize functionality with multi-directional support
+  const resizeHandles = document.querySelectorAll('.resize-handle');
+  
+  resizeHandles.forEach(handle => {
+    handle.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isResizing = true;
+      chatContainer.classList.add("resizing");
       
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
+      const direction = handle.dataset.direction;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startWidth = chatContainer.offsetWidth;
+      const startHeight = chatContainer.offsetHeight;
+      const startLeft = chatContainer.getBoundingClientRect().left;
+      const startTop = chatContainer.getBoundingClientRect().top;
+      const widgetRect = chatWidget.getBoundingClientRect();
       
-      let newWidth = startWidth + deltaX;
-      let newHeight = startHeight + deltaY; // Fixed: positive for normal resizing
+      // Create resize overlay for better UX
+      const resizeOverlay = document.createElement('div');
+      resizeOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        cursor: ${handle.style.cursor};
+      `;
+      document.body.appendChild(resizeOverlay);
       
-      // Dynamic constraints based on viewport with strict boundaries
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const padding = 25; // Strict padding for chatbox boundaries
+      document.body.style.userSelect = "none";
+      document.body.style.cursor = handle.style.cursor;
       
-      const minWidth = 320;
-      const maxWidth = Math.max(minWidth, viewportWidth - padding * 2);
-      const minHeight = 450;
-      const maxHeight = Math.max(minHeight, viewportHeight - padding * 2);
-      
-      // Strict size enforcement - never allow overflow
-      newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-      newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
-      
-      // Apply new dimensions
-      chatContainer.style.width = newWidth + "px";
-      chatContainer.style.height = newHeight + "px";
-      chatContainer.style.maxWidth = newWidth + "px";
-      chatContainer.style.maxHeight = newHeight + "px";
-      
-      // Update stored size
-      storedSize = { width: Math.round(newWidth), height: Math.round(newHeight) };
-      currentSize = { ...storedSize };
-      isMaximized = false;
-      chatContainer.classList.remove("maximized");
-      
-      // Strict position adjustment - prevent any overflow
-      const containerRect = chatContainer.getBoundingClientRect();
-      
-      // Horizontal bounds - strict enforcement
-      if (containerRect.left < padding) {
-        chatWidget.style.left = padding + "px";
-        chatWidget.style.right = "auto";
-      } else if (containerRect.right > viewportWidth - padding) {
-        const overflow = containerRect.right - (viewportWidth - padding);
-        if (chatContainer.style.right) {
-          const currentRight = parseInt(chatContainer.style.right) || 0;
-          chatContainer.style.right = Math.max(0, currentRight + overflow) + "px";
-        } else {
-          const currentLeft = parseInt(chatContainer.style.left) || 0;
-          chatContainer.style.left = Math.max(padding, currentLeft - overflow) + "px";
+      const handleMouseMove = (e) => {
+        if (!isResizing) return;
+        
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+        
+        let newWidth = startWidth;
+        let newHeight = startHeight;
+        let newLeft = startLeft;
+        let newTop = startTop;
+        
+        // Dynamic constraints based on viewport with strict boundaries
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const padding = 15;
+        
+        const minWidth = 320;
+        const maxWidth = Math.max(minWidth, viewportWidth - padding * 2);
+        const minHeight = 450;
+        const maxHeight = Math.max(minHeight, viewportHeight - padding * 2);
+        
+        // Handle different resize directions
+        if (direction.includes('e')) {
+          newWidth = startWidth + deltaX;
         }
-      }
-      
-      // Vertical bounds - strict enforcement
-      if (containerRect.top < padding) {
-        chatWidget.style.top = padding + "px";
-        chatWidget.style.bottom = "auto";
-      } else if (containerRect.bottom > viewportHeight - padding) {
-        const overflow = containerRect.bottom - (viewportHeight - padding);
-        if (chatContainer.style.bottom) {
-          const currentBottom = parseInt(chatContainer.style.bottom) || 0;
-          chatContainer.style.bottom = Math.max(0, currentBottom + overflow) + "px";
-        } else {
-          const currentTop = parseInt(chatContainer.style.top) || 0;
-          chatContainer.style.top = Math.max(padding, currentTop - overflow) + "px";
+        if (direction.includes('w')) {
+          newWidth = startWidth - deltaX;
+          newLeft = startLeft + deltaX;
         }
-      }
+        if (direction.includes('s')) {
+          newHeight = startHeight + deltaY;
+        }
+        if (direction.includes('n')) {
+          newHeight = startHeight - deltaY;
+          newTop = startTop + deltaY;
+        }
+        
+        // Strict size enforcement - never allow overflow
+        newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+        newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+        
+        // Position constraints for left/top resizing
+        if (direction.includes('w')) {
+          newLeft = Math.max(padding, Math.min(newLeft, startLeft + startWidth - minWidth));
+        }
+        if (direction.includes('n')) {
+          newTop = Math.max(padding, Math.min(newTop, startTop + startHeight - minHeight));
+        }
+        
+        // Apply new dimensions and position
+        chatContainer.style.width = newWidth + "px";
+        chatContainer.style.height = newHeight + "px";
+        chatContainer.style.maxWidth = newWidth + "px";
+        chatContainer.style.maxHeight = newHeight + "px";
+        
+        if (direction.includes('w')) {
+          chatContainer.style.left = newLeft + "px";
+          chatContainer.style.right = "auto";
+        }
+        if (direction.includes('n')) {
+          chatContainer.style.top = newTop + "px";
+          chatContainer.style.bottom = "auto";
+        }
+        
+        // Update stored size
+        storedSize = { width: newWidth, height: newHeight };
+        currentSize = { ...storedSize };
+        
+        // Ensure container stays within viewport during resize
+        requestAnimationFrame(() => {
+          constrainChatContainerToViewport();
+        });
+      };
       
-      // Ensure widget position stays within bounds
-      const widgetRectAfter = chatWidget.getBoundingClientRect();
-      const maxWidgetLeft = viewportWidth - widgetRectAfter.width - 5; // Allow icon near border
-      const maxWidgetTop = viewportHeight - widgetRectAfter.height - 5;
+      const handleMouseUp = () => {
+        isResizing = false;
+        chatContainer.classList.remove("resizing");
+        document.body.removeChild(resizeOverlay);
+        document.body.style.userSelect = "";
+        document.body.style.cursor = "";
+        localStorage.setItem("querybee_size", JSON.stringify(storedSize));
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
       
-      let finalLeft = parseFloat(chatWidget.style.left) || widgetRectAfter.left;
-      let finalTop = parseFloat(chatWidget.style.top) || widgetRectAfter.top;
-      
-      finalLeft = Math.max(5, Math.min(finalLeft, maxWidgetLeft));
-      finalTop = Math.max(5, Math.min(finalTop, maxWidgetTop));
-      
-      chatWidget.style.left = finalLeft + "px";
-      chatWidget.style.top = finalTop + "px";
-      chatWidget.style.right = "auto";
-      chatWidget.style.bottom = "auto";
-      currentPosition = { x: finalLeft, y: finalTop };
-    };
-    
-    const handleMouseUp = () => {
-      isResizing = false;
-      chatContainer.classList.remove("resizing");
-      document.body.removeChild(resizeOverlay);
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
-      localStorage.setItem("querybee_size", JSON.stringify(storedSize));
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-    
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    });
   });
   
   // Update chat position on window resize
