@@ -20,6 +20,14 @@
   ],
   "routes": [
     {
+      "src": "/styles.css",
+      "dest": "/styles.css"
+    },
+    {
+      "src": "/script.js",
+      "dest": "/script.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/backend/api/server.js"
     },
