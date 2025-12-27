@@ -20,8 +20,9 @@ async function getAccessToken() {
   }
   
   if (!authClientPromise) {
+    const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS || SERVICE_ACCOUNT_PATH;
     const auth = new GoogleAuth({
-      keyFile: SERVICE_ACCOUNT_PATH,
+      keyFile,
       scopes: ['https://www.googleapis.com/auth/cloud-platform']
     });
     authClientPromise = auth.getClient();
@@ -55,13 +56,21 @@ const SERVICE_ACCOUNT_PATH =
   'C:\\Users\\morev\\OneDrive\\Desktop\\QueryBee\\querybee-key.json';
 
 // Vercel helper: if GOOGLE_APPLICATION_CREDENTIALS is a JSON string, write to temp file for GoogleAuth
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS && !fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS.trim();
   if (envCreds.startsWith('{')) {
     const tmpPath = path.join(os.tmpdir(), 'querybee-service-account.json');
-    fs.writeFileSync(tmpPath, envCreds);
+    fs.writeFileSync(tmpPath, envCreds, 'utf8');
     process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
     console.log('Wrote service-account JSON from env var to temp file:', tmpPath);
+  } else {
+    try {
+      if (!fs.existsSync(envCreds)) {
+        console.warn('GOOGLE_APPLICATION_CREDENTIALS path does not exist:', envCreds);
+      }
+    } catch (e) {
+      console.warn('Failed to validate GOOGLE_APPLICATION_CREDENTIALS path');
+    }
   }
 }
 
