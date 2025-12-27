@@ -7,7 +7,6 @@
 *.json
 !package.json
 !package-lock.json
-!querybee-key.json
 !windsurf.json
 
 # Node modules
