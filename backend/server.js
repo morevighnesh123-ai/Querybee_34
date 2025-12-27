@@ -73,6 +73,7 @@ console.log("Project ID:", PROJECT_ID);
 console.log("Knowledge Base ID:", KNOWLEDGE_BASE_ID);
 console.log("Using REST API:", USE_REST_API);
 console.log("Service Account Path:", SERVICE_ACCOUNT_PATH);
+console.log("Has DIALOGFLOW_ACCESS_TOKEN:", !!(ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0));
 console.log("================================\n");
 
 // Enable CORS for all routes
@@ -106,7 +107,7 @@ if (!USE_REST_API) {
     client = null;
   }
 } else {
-  console.log('✓ Using Dialogflow REST API with access token');
+  console.log('✓ Using Dialogflow REST API');
 }
 
 // Serve static files - check both backend/public and root public
@@ -141,8 +142,10 @@ async function callDialogflowREST(userQuery, sessionId) {
   console.log("REST API Request Body:", JSON.stringify(requestBody, null, 2));
 
   try {
-    // Always use auto-refreshed service-account token (no hourly manual refresh)
-    const accessToken = await getAccessToken();
+    // Prefer user-provided access token from .env; fall back to service-account token generation.
+    const accessToken = ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0
+      ? ACCESS_TOKEN.trim()
+      : await getAccessToken();
     
     const response = await axios.post(dialogflowUrl, requestBody, {
       headers: {
@@ -474,7 +477,11 @@ app.listen(port, () => {
   console.log(`📋 Dialogflow Project ID: ${PROJECT_ID}`);
   console.log(`📚 Knowledge Base ID: ${KNOWLEDGE_BASE_ID}`);
   if (USE_REST_API) {
-    console.log('✓ Authentication: Using REST API with access token');
+    if (ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0) {
+      console.log('✓ Authentication: Using REST API with DIALOGFLOW_ACCESS_TOKEN (.env)');
+    } else {
+      console.log('✓ Authentication: Using REST API with service-account generated token');
+    }
   } else if (client) {
     console.log('✓ Authentication: Using Google Cloud SDK');
     if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
@@ -487,12 +494,6 @@ app.listen(port, () => {
   console.log('');
 });
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Vercel serverless function export
-module.exports = app;
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
