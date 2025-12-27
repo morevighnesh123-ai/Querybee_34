@@ -64,10 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  const API_URL = "https://query-bee-mauve.vercel.app";
+
   // Check backend connection status
   async function checkConnectionStatus() {
     try {
-      const response = await fetch('http://localhost:3000', {
+      const response = await fetch(API_URL, {
         method: 'GET',
         timeout: 3000
       });
@@ -973,7 +975,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Call backend POST /api/dialogflow
-    fetch("http://localhost:3000/api/dialogflow", {
+    fetch(`${API_URL}/api/dialogflow`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: text, sessionId })
