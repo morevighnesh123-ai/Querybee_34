@@ -98,6 +98,16 @@ app.get('/api/test', (req, res) => {
   res.json({ message: "Backend working fine!" });
 });
 
+app.get('/api/token', async (req, res) => {
+  try {
+    const token = await getAccessToken();
+    res.json({ accessToken: token });
+  } catch (error) {
+    console.error('Token generation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/dialogflow', async (req, res) => {
   try {
     const userQuery = req.body.query;
