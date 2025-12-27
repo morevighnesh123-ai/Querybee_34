@@ -7,6 +7,7 @@
 *.json
 !package.json
 !package-lock.json
+!vercel.json
 !windsurf.json
 
 # Node modules

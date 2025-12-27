@@ -53,6 +53,17 @@ async function getAccessToken() {
 const SERVICE_ACCOUNT_PATH =
   'C:\\Users\\morev\\OneDrive\\Desktop\\QueryBee\\querybee-key.json';
 
+// Vercel helper: if GOOGLE_APPLICATION_CREDENTIALS is a JSON string, write to temp file for GoogleAuth
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS && !fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
+  const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS.trim();
+  if (envCreds.startsWith('{')) {
+    const tmpPath = path.join(__dirname, 'tmp-service-account.json');
+    fs.writeFileSync(tmpPath, envCreds);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
+    console.log('Wrote service-account JSON from env var to temp file:', tmpPath);
+  }
+}
+
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS && SERVICE_ACCOUNT_PATH && fs.existsSync(SERVICE_ACCOUNT_PATH)) {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = SERVICE_ACCOUNT_PATH;
   console.log(`Using Dialogflow service-account key from: ${SERVICE_ACCOUNT_PATH}`);
