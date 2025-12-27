@@ -20,7 +20,10 @@ async function getAccessToken() {
   }
   
   if (!authClientPromise) {
-    const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS || 'C:\\Users\\morev\\OneDrive\\Desktop\\QueryBee\\querybee-key.json';
+    const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (!keyFile) {
+      throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable not set');
+    }
     const auth = new GoogleAuth({
       keyFile,
       scopes: ['https://www.googleapis.com/auth/cloud-platform']
