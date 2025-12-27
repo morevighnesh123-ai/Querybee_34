@@ -7,7 +7,9 @@ const { SessionsClient } = require('@google-cloud/dialogflow');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const { GoogleAuth } = require('google-auth-library');
-require('dotenv').config();
+if (!process.env.VERCEL) {
+  require('dotenv').config();
+}
 
 // Auto token generation for REST API
 let cachedToken = null;
@@ -21,6 +23,8 @@ async function getAccessToken() {
   
   if (!authClientPromise) {
     const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    console.log('GOOGLE_APPLICATION_CREDENTIALS length:', envCreds ? envCreds.length : 'undefined');
+    console.log('GOOGLE_APPLICATION_CREDENTIALS first 100 chars:', envCreds ? envCreds.slice(0, 100) : 'undefined');
     if (!envCreds) {
       throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable not set');
     }
