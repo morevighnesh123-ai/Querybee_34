@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { SessionsClient } = require('@google-cloud/dialogflow');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
@@ -57,7 +58,7 @@ const SERVICE_ACCOUNT_PATH =
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS && !fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
   const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS.trim();
   if (envCreds.startsWith('{')) {
-    const tmpPath = path.join(__dirname, 'tmp-service-account.json');
+    const tmpPath = path.join(os.tmpdir(), 'querybee-service-account.json');
     fs.writeFileSync(tmpPath, envCreds);
     process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
     console.log('Wrote service-account JSON from env var to temp file:', tmpPath);
@@ -483,27 +484,31 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`\n🚀 Server running at http://localhost:${port}`);
-  console.log(`📋 Dialogflow Project ID: ${PROJECT_ID}`);
-  console.log(`📚 Knowledge Base ID: ${KNOWLEDGE_BASE_ID}`);
-  if (USE_REST_API) {
-    if (ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0) {
-      console.log('✓ Authentication: Using REST API with DIALOGFLOW_ACCESS_TOKEN (.env)');
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`\n🚀 Server running at http://localhost:${port}`);
+    console.log(`📋 Dialogflow Project ID: ${PROJECT_ID}`);
+    console.log(`📚 Knowledge Base ID: ${KNOWLEDGE_BASE_ID}`);
+    if (USE_REST_API) {
+      if (ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0) {
+        console.log('✓ Authentication: Using REST API with DIALOGFLOW_ACCESS_TOKEN (.env)');
+      } else {
+        console.log('✓ Authentication: Using REST API with service-account generated token');
+      }
+    } else if (client) {
+      console.log('✓ Authentication: Using Google Cloud SDK');
+      if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        console.warn('⚠️  Using default credentials. For production, set GOOGLE_APPLICATION_CREDENTIALS');
+      }
     } else {
-      console.log('✓ Authentication: Using REST API with service-account generated token');
+      console.error('❌ ERROR: No Dialogflow credentials configured!');
+      console.error('   Set either DIALOGFLOW_ACCESS_TOKEN or GOOGLE_APPLICATION_CREDENTIALS');
     }
-  } else if (client) {
-    console.log('✓ Authentication: Using Google Cloud SDK');
-    if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      console.warn('⚠️  Using default credentials. For production, set GOOGLE_APPLICATION_CREDENTIALS');
-    }
-  } else {
-    console.error('❌ ERROR: No Dialogflow credentials configured!');
-    console.error('   Set either DIALOGFLOW_ACCESS_TOKEN or GOOGLE_APPLICATION_CREDENTIALS');
-  }
-  console.log('');
-});
+    console.log('');
+  });
+}
+
+module.exports = app;
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
