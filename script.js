@@ -973,7 +973,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Call backend POST /api/dialogflow
-    fetch("http://localhost:3000/api/dialogflow", {
+    fetch("https://query-bee-mauve.vercel.app/api/dialogflow", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: text, sessionId })
