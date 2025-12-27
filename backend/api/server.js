@@ -107,8 +107,8 @@ app.post('/api/dialogflow', async (req, res) => {
     }
 
     const accessToken = ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0
-      ? ACCESS_TOKEN.trim()
-      : await getAccessToken();
+  ? ACCESS_TOKEN.trim()
+  : await getAccessToken();
 
     const dialogflowUrl = `https://dialogflow.googleapis.com/v2beta1/projects/${PROJECT_ID}/agent/sessions/${sessionId}:detectIntent`;
     const kbPath = `projects/${PROJECT_ID}/knowledgeBases/${KNOWLEDGE_BASE_ID}`;
