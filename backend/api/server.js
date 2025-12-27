@@ -22,18 +22,18 @@ async function getAccessToken() {
   }
   
   if (!authClientPromise) {
-    const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const envCreds = process.env.GOOGLE_CREDS_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS;
     console.log('GOOGLE_APPLICATION_CREDENTIALS length:', envCreds ? envCreds.length : 'undefined');
     console.log('GOOGLE_APPLICATION_CREDENTIALS first 100 chars:', envCreds ? envCreds.slice(0, 100) : 'undefined');
     if (!envCreds) {
-      throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable not set');
+      throw new Error('GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_CREDS_JSON environment variable not set');
     }
     let credentials;
     if (envCreds.trim().startsWith('{')) {
       credentials = JSON.parse(envCreds.trim());
-      console.log('Using GOOGLE_APPLICATION_CREDENTIALS as JSON object');
+      console.log('Using service account JSON from env var');
     } else {
-      throw new Error('GOOGLE_APPLICATION_CREDENTIALS must be a JSON object string on Vercel');
+      throw new Error('Service account credentials must be a JSON object string in env var. Set GOOGLE_CREDS_JSON on Vercel.');
     }
     const auth = new GoogleAuth({
       credentials,
