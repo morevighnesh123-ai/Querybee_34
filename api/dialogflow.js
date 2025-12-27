@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-const fs = require('fs');
 const { SessionsClient } = require('@google-cloud/dialogflow');
-const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
 const { GoogleAuth } = require('google-auth-library');
+const axios = require('axios');
 require('dotenv').config();
+
+// Dialogflow configuration
+const PROJECT_ID = process.env.DIALOGFLOW_PROJECT_ID;
+const KNOWLEDGE_BASE_ID = process.env.DIALOGFLOW_KNOWLEDGE_BASE_ID;
+const USE_REST_API = !!process.env.DIALOGFLOW_ACCESS_TOKEN;
 
 // Auto token generation for REST API
 let cachedToken = null;
@@ -28,55 +28,27 @@ async function getAccessToken() {
   const token = await authClient.getAccessToken();
   
   cachedToken = token;
-  tokenExpiry = Date.now() + (55 * 60 * 1000); // 55 minutes
+  tokenExpiry = Date.now() + (55 * 60 * 1000);
   
   return cachedToken;
 }
 
-// Dialogflow configuration
-const PROJECT_ID = process.env.DIALOGFLOW_PROJECT_ID || 'your-project-id';
-const KNOWLEDGE_BASE_ID = process.env.DIALOGFLOW_KNOWLEDGE_BASE_ID || 'your-knowledge-base-id';
-const USE_REST_API = !!process.env.DIALOGFLOW_ACCESS_TOKEN;
-
-// Initialize Dialogflow client
-let client = null;
-if (!USE_REST_API) {
-  try {
-    client = new SessionsClient({
-      projectId: PROJECT_ID,
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || null,
-    });
-  } catch (error) {
-    console.error('Error initializing Dialogflow client:', error.message);
-  }
-}
-
-// Create Express app
-const app = express();
-
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Enable CORS for all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
+    res.status(200).end();
+    return;
   }
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Dialogflow API endpoint
-app.post('/dialogflow', async (req, res) => {
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
   try {
     const { query, sessionId } = req.body;
     
@@ -114,9 +86,10 @@ app.post('/dialogflow', async (req, res) => {
       response = axiosResponse.data;
     } else {
       // Use client library
-      if (!client) {
-        return res.status(500).json({ error: 'Dialogflow client not initialized' });
-      }
+      const client = new SessionsClient({
+        projectId: PROJECT_ID,
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || null,
+      });
       
       const sessionPath = client.projectAgentSessionPath(PROJECT_ID, sessionId);
       
@@ -153,7 +126,4 @@ app.post('/dialogflow', async (req, res) => {
       details: error.message 
     });
   }
-});
-
-// Export for Vercel
-module.exports = app;
+};
