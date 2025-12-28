@@ -147,9 +147,11 @@ app.post('/api/dialogflow', async (req, res) => {
       return res.status(400).json({ error: "Missing 'query' in request body" });
     }
 
-    const accessToken = (ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0)
-      ? (console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'), ACCESS_TOKEN.trim())
-      : (console.log('Falling back to auto-generated token from service account'), await getAccessToken());
+    const hasManualToken = !!(ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0);
+    const manualToken = hasManualToken ? ACCESS_TOKEN.trim() : null;
+    const initialToken = hasManualToken
+      ? (console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'), manualToken)
+      : (console.log('Using auto-generated token from service account'), await getAccessToken());
 
     const dialogflowUrl = `https://dialogflow.googleapis.com/v2beta1/projects/${PROJECT_ID}/agent/sessions/${sessionId}:detectIntent`;
     const kbPath = `projects/${PROJECT_ID}/knowledgeBases/${KNOWLEDGE_BASE_ID}`;
@@ -161,12 +163,28 @@ app.post('/api/dialogflow', async (req, res) => {
       queryParams: { knowledgeBaseNames: [kbPath] }
     };
 
-    const response = await axios.post(dialogflowUrl, requestBody, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
+    const doRequest = async (tokenToUse) => {
+      return axios.post(dialogflowUrl, requestBody, {
+        headers: {
+          'Authorization': `Bearer ${tokenToUse}`,
+          'Content-Type': 'application/json'
+        }
+      });
+    };
+
+    let response;
+    try {
+      response = await doRequest(initialToken);
+    } catch (err) {
+      const status = err?.response?.status;
+      if (hasManualToken && (status === 401 || status === 403)) {
+        console.log('Manual token rejected, retrying with service-account token');
+        const serviceToken = await getAccessToken();
+        response = await doRequest(serviceToken);
+      } else {
+        throw err;
       }
-    });
+    }
 
     const result = response.data.queryResult;
     const reply = result.fulfillmentText || result.queryText || "Sorry, I didn't understand that.";
