@@ -111,6 +111,7 @@ app.get('/api/token', async (req, res) => {
 
 app.get('/api/token-status', async (req, res) => {
   try {
+    const forceService = req.query.forceService === '1' || req.query.forceService === 'true';
     const hasManualToken = !!(process.env.DIALOGFLOW_ACCESS_TOKEN && process.env.DIALOGFLOW_ACCESS_TOKEN.trim());
     const hasServiceAccountJson = !!(process.env.GOOGLE_CREDS_JSON && process.env.GOOGLE_CREDS_JSON.trim().startsWith('{'));
     const hasGoogleAppCreds = !!process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -126,11 +127,15 @@ app.get('/api/token-status', async (req, res) => {
       tokenExpiresInSeconds: tokenExpiry ? Math.max(0, Math.floor((tokenExpiry - Date.now()) / 1000)) : null,
     };
 
-    if (!hasManualToken) {
-      await getAccessToken();
-      status.cachedToken = !!cachedToken;
-      status.tokenExpiryMs = tokenExpiry;
-      status.tokenExpiresInSeconds = tokenExpiry ? Math.max(0, Math.floor((tokenExpiry - Date.now()) / 1000)) : null;
+    if (forceService || !hasManualToken) {
+      try {
+        await getAccessToken();
+        status.cachedToken = !!cachedToken;
+        status.tokenExpiryMs = tokenExpiry;
+        status.tokenExpiresInSeconds = tokenExpiry ? Math.max(0, Math.floor((tokenExpiry - Date.now()) / 1000)) : null;
+      } catch (e) {
+        status.serviceTokenError = e.message;
+      }
     }
 
     res.json({ status: 'ok', ...status });
@@ -143,13 +148,14 @@ app.post('/api/dialogflow', async (req, res) => {
   try {
     const userQuery = req.body.query;
     const sessionId = req.body.sessionId || uuidv4();
+    const forceService = req.query.forceService === '1' || req.query.forceService === 'true';
     if (!userQuery) {
       return res.status(400).json({ error: "Missing 'query' in request body" });
     }
 
     const hasManualToken = !!(ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0);
     const manualToken = hasManualToken ? ACCESS_TOKEN.trim() : null;
-    const initialToken = hasManualToken
+    const initialToken = (!forceService && hasManualToken)
       ? (console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'), manualToken)
       : (console.log('Using auto-generated token from service account'), await getAccessToken());
 
@@ -177,7 +183,7 @@ app.post('/api/dialogflow', async (req, res) => {
       response = await doRequest(initialToken);
     } catch (err) {
       const status = err?.response?.status;
-      if (hasManualToken && (status === 401 || status === 403)) {
+      if (!forceService && hasManualToken && (status === 401 || status === 403)) {
         console.log('Manual token rejected, retrying with service-account token');
         const serviceToken = await getAccessToken();
         response = await doRequest(serviceToken);
