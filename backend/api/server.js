@@ -8,7 +8,7 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const { GoogleAuth } = require('google-auth-library');
 if (!process.env.VERCEL) {
-  require('dotenv').config();
+  require('dotenv').config({ override: true });
 }
 
 // Auto token generation for REST API
@@ -34,7 +34,18 @@ async function getAccessToken() {
       credentials = JSON.parse(envCreds.trim());
       console.log('Using service account JSON from env var');
     } else {
-      throw new Error('Service account credentials must be a JSON object string in env var. Set GOOGLE_CREDS_JSON on Vercel.');
+      const credsPath = envCreds.trim();
+      try {
+        const fileJson = fs.readFileSync(credsPath, 'utf8');
+        credentials = JSON.parse(fileJson);
+        console.log('Using service account JSON from file path:', credsPath);
+      } catch (e) {
+        throw new Error(`Service account credentials could not be loaded. Provide GOOGLE_CREDS_JSON (inline JSON) or set GOOGLE_APPLICATION_CREDENTIALS to a valid JSON file path. Details: ${e.message}`);
+      }
+    }
+
+    if (credentials && typeof credentials.private_key === 'string' && credentials.private_key.includes('\\n')) {
+      credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
     }
     const auth = new GoogleAuth({
       credentials,
@@ -212,3 +223,10 @@ app.post('/api/dialogflow', async (req, res) => {
 });
 
 module.exports = app;
+
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`QueryBee API listening on http://localhost:${port}`);
+  });
+}

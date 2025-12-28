@@ -6,8 +6,11 @@
       "use": "@vercel/node"
     },
     {
-      "src": "index.html",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     },
     {
       "src": "styles.css",
@@ -19,21 +22,14 @@
     }
   ],
   "routes": [
-    {
-      "src": "/styles.css",
-      "dest": "/styles.css"
-    },
-    {
-      "src": "/script.js",
-      "dest": "/script.js"
-    },
+    { "handle": "filesystem" },
     {
       "src": "/api/(.*)",
       "dest": "/backend/api/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/dist/index.html"
     }
   ]
 }

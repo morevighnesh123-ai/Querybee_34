@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MLDC | M. L. Dahanukar College of Commerce (Autonomous)</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -258,155 +261,9 @@
         </div>
     </section>
 
-    <!-- Floating QueryBee Chat Widget -->
-    <div id="chat-widget" class="chat-widget">
-        <!-- Floating Toggle Button -->
-        <div id="chat-toggle" class="chat-toggle">
-            <i class="fas fa-comments"></i>
-        </div>
-
-        <!-- Chat Container -->
-        <div id="chat-container" class="chat-container">
-            <!-- Resize Handles for all borders -->
-            <div class="resize-handle resize-handle-nw" data-direction="nw"></div>
-            <div class="resize-handle resize-handle-n" data-direction="n"></div>
-            <div class="resize-handle resize-handle-ne" data-direction="ne"></div>
-            <div class="resize-handle resize-handle-e" data-direction="e"></div>
-            <div class="resize-handle resize-handle-se" id="resize-handle" data-direction="se"></div>
-            <div class="resize-handle resize-handle-s" data-direction="s"></div>
-            <div class="resize-handle resize-handle-sw" data-direction="sw"></div>
-            <div class="resize-handle resize-handle-w" data-direction="w"></div>
-
-            <!-- Header Section -->
-            <header class="chat-header">
-                <div class="header-left">
-                    <div class="brand-section">
-                        <h1 class="brand-name">
-                            <span class="brand-icon">🤖</span>QueryBee
-                            <span class="online-indicator" id="online-indicator">
-                                <span class="status-dot" id="status-dot"></span>
-                                <span class="status-text" id="status-text">Online</span>
-                            </span>
-                        </h1>
-                    </div>
-                </div>
-                <div class="window-controls">
-                    <button id="minimize-btn" class="window-btn" type="button" title="Minimize">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button id="fullscreen-btn" class="window-btn fullscreen-btn" type="button" title="Full Display">
-                        <i class="fas fa-expand-arrows-alt"></i>
-                    </button>
-                    <button id="close-btn" class="window-btn close-button" type="button" title="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Chat Area -->
-            <main class="chat-area">
-                <div id="chat-messages" class="messages-container">
-                    <!-- Messages will be dynamically added here -->
-                </div>
-
-                <!-- Quick Questions -->
-                <div id="quick-questions" class="quick-questions">
-                    <div class="quick-btn" data-question="What is QueryBee?">
-                        <i class="fas fa-question-circle"></i>
-                        <span>What is QueryBee?</span>
-                        <button class="quick-btn-remove" type="button" title="Remove suggestion">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="quick-btn" data-question="How does it work?">
-                        <i class="fas fa-cogs"></i>
-                        <span>How does it work?</span>
-                        <button class="quick-btn-remove" type="button" title="Remove suggestion">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="quick-btn" data-question="What can you help me with?">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>What can you help me with?</span>
-                        <button class="quick-btn-remove" type="button" title="Remove suggestion">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Input Area -->
-                <div class="input-container">
-                    <input type="text" id="user-input" placeholder="Write a message" autocomplete="off">
-                    <button id="voice-btn" class="voice-button" type="button" title="Hold to speak">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <button id="send-btn" class="send-button">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <footer class="chat-footer">
-                <p class="footer-text">
-                    By chatting, you agree to our <a href="terms.html" class="footer-link">privacy policy</a>.
-                </p>
-                <button id="clear-chat-btn" class="clear-chat-btn" type="button">
-                    <i class="fas fa-trash-alt"></i>
-                    Clear chat
-                </button>
-                <p class="footer-powered">
-                    Powered by <span class="footer-brand">🤖 Vighnesh More</span>
-                </p>
-            </footer>
-        </div>
+    <div id="querybee">
+        <div id="querybee-root"></div>
     </div>
-
-    <!-- Original QueryBee Section (now hidden) -->
-    <section id="querybee" class="querybee-section" style="display: none;">
-        <div class="container">
-            <div class="section-header">
-                <h2>QueryBee Assistant</h2>
-                <p>Your AI-powered college information assistant</p>
-            </div>
-
-            <div class="querybee-container">
-                <!-- Features Panel -->
-                <div class="features-panel">
-                    <div class="features-header">
-                        <h3>Quick Info</h3>
-                    </div>
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <i class="fas fa-graduation-cap"></i>
-                            <h4>Courses</h4>
-                            <p>Commerce, Science, Arts & Professional programs</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-phone"></i>
-                            <h4>Contact</h4>
-                            <p>+91 22 2614 4321</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-clock"></i>
-                            <h4>Timings</h4>
-                            <p>7:30 AM - 5:30 PM</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <h4>Location</h4>
-                            <p>Vile Parle, Mumbai</p>
-                        </div>
-                    </div>
-
-                    <div class="connection-status" id="connectionStatus">
-                        <i class="fas fa-wifi"></i>
-                        <span>Checking connection...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Notices Section -->
     <section class="notices-section">
@@ -515,7 +372,8 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>

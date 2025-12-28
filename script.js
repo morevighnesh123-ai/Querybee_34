@@ -3,6 +3,37 @@
 // QueryBee College Assistant JavaScript - Enhanced Floating Chat with Advanced Features
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Mobile menu toggle
+  window.toggleMobileMenu = function() {
+    const mainMenu = document.querySelector('.main-menu');
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (!mainMenu || !mobileToggle) return;
+    
+    if (mainMenu.classList.contains('active')) {
+      mainMenu.classList.remove('active');
+      mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    } else {
+      mainMenu.classList.add('active');
+      mobileToggle.innerHTML = '<i class="fas fa-times"></i>';
+    }
+  };
+
+  window.scrollToQueryBee = function() {
+    const el = document.getElementById('querybee') || document.getElementById('querybee-root');
+    if (!el) return;
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      el.scrollIntoView();
+    }
+  };
+
+  // React widget is active; do not initialize legacy chat widget JS.
+  if (document.getElementById('querybee-root')) {
+    return;
+  }
+
   const chatToggle = document.getElementById("chat-toggle");
   const chatContainer = document.getElementById("chat-container");
   const chatWidget = document.getElementById("chat-widget");
@@ -11,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const fullscreenBtn = document.getElementById("fullscreen-btn");
   const chatHeader = document.querySelector(".chat-header");
   const sendBtn = document.getElementById("send-btn");
+  const sendBtnIcon = sendBtn ? sendBtn.querySelector('i') : null;
+  const resizeBtn = document.getElementById("resize-btn");
   const userInput = document.getElementById("user-input");
   const chatMessages = document.getElementById("chat-messages");
   const quickQuestions = document.getElementById("quick-questions");
@@ -22,6 +55,37 @@ document.addEventListener("DOMContentLoaded", () => {
   // Connection status elements
   const statusDot = document.getElementById('status-dot');
   const statusText = document.getElementById('status-text');
+
+  if (!chatToggle || !chatContainer || !chatWidget) {
+    return;
+  }
+
+  const isTouchDevice =
+    (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+
+  if (isTouchDevice) {
+    document.documentElement.classList.add('touch');
+    if (chatWidget) chatWidget.classList.add('touch');
+  }
+
+  const API_BASE = (() => {
+    const explicit = (window.__QUERYBEE_API_BASE__ || '').trim();
+    if (explicit) return explicit.replace(/\/$/, '');
+    if (window.location && window.location.protocol === 'file:') {
+      return 'http://localhost:3000';
+    }
+    if (
+      window.location &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+      window.location.port &&
+      window.location.port !== '3000'
+    ) {
+      return 'http://localhost:3000';
+    }
+    return '';
+  })();
   
   const HISTORY_KEY = "querybee_history";
   const MAX_HISTORY = 200;
@@ -49,28 +113,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // Connection status management
   let isConnected = false;
   let connectionCheckInterval = null;
+  let isSending = false;
 
-  // Mobile menu toggle
-  window.toggleMobileMenu = function() {
-    const mainMenu = document.querySelector('.main-menu');
-    const mobileToggle = document.querySelector('.mobile-menu-toggle');
-    
-    if (mainMenu.classList.contains('active')) {
-      mainMenu.classList.remove('active');
-      mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-    } else {
-      mainMenu.classList.add('active');
-      mobileToggle.innerHTML = '<i class="fas fa-times"></i>';
+  function setSendingState(next) {
+    isSending = next;
+    if (sendBtn) sendBtn.disabled = next;
+    if (voiceBtn) voiceBtn.disabled = next;
+    if (sendBtnIcon) {
+      if (next) {
+        sendBtnIcon.className = 'fas fa-circle-notch fa-spin';
+      } else {
+        sendBtnIcon.className = 'fas fa-paper-plane';
+      }
     }
-  };
+  }
 
   // Check backend connection status
   async function checkConnectionStatus() {
     try {
-      const response = await fetch('http://localhost:3000', {
+      if (statusText) statusText.textContent = 'Checking...';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const response = await fetch(`${API_BASE}/api/test`, {
         method: 'GET',
-        timeout: 3000
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         isConnected = true;
@@ -596,32 +664,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Add touch support for mobile dragging
-  chatToggle.addEventListener("touchstart", (e) => {
-    if (!isOpen) {
-      startWidgetDrag(e.touches[0]);
-    }
-  }, { passive: true });
-
-  chatWidget.addEventListener("touchmove", (e) => {
-    if (!isOpen && isDragging) {
-      e.preventDefault();
-      const touch = e.touches[0];
-      const mouseEvent = new MouseEvent('mousemove', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-      document.dispatchEvent(mouseEvent);
-    }
-  }, { passive: false });
-
-  chatWidget.addEventListener("touchend", (e) => {
-    if (!isOpen && isDragging) {
-      const mouseEvent = new MouseEvent('mouseup');
-      document.dispatchEvent(mouseEvent);
-    }
-  }, { passive: true });
-
   // Close button handler
   closeBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -644,6 +686,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setupDragHandle(handle, { requireOpen = false } = {}) {
     if (!handle) return;
+    if (isTouchDevice) return;
     handle.addEventListener("mousedown", (event) => {
       if (event.button !== 0) return;
       if (requireOpen && !isOpen) return;
@@ -811,9 +854,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Enhanced resize functionality with multi-directional support
   const resizeHandles = document.querySelectorAll('.resize-handle');
-  
-  resizeHandles.forEach(handle => {
-    handle.addEventListener("mousedown", (e) => {
+ 
+  if (!isTouchDevice) {
+    resizeHandles.forEach(handle => {
+      handle.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
       isResizing = true;
@@ -932,8 +976,9 @@ document.addEventListener("DOMContentLoaded", () => {
       
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
+      });
     });
-  });
+  }
   
   // Update chat position on window resize
   window.addEventListener("resize", () => {
@@ -953,6 +998,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Send message function
   function sendMessage(text) {
     if (!text.trim()) return;
+    if (isSending) return;
+    if (!isConnected) {
+      addMessage("QueryBee", "I'm offline right now. Please start the backend and try again.", "bot");
+      checkConnectionStatus();
+      return;
+    }
 
     // Hide quick questions after first user message
     if (quickQuestions && quickQuestions.style.display !== "none") {
@@ -964,6 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show typing indicator in messages container
     showTypingIndicator();
+    setSendingState(true);
 
     // Persistent session id for contexts
     let sessionId = localStorage.getItem("querybee_session");
@@ -973,12 +1025,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Call backend POST /api/dialogflow
-    fetch("https://query-bee-mauve.vercel.app/api/dialogflow", {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    fetch(`${API_BASE}/api/dialogflow`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: text, sessionId })
+      body: JSON.stringify({ query: text, sessionId }),
+      signal: controller.signal
     })
       .then(async response => {
+        clearTimeout(timeoutId);
         const contentType = response.headers.get("content-type") || "";
         if (!contentType.includes("application/json")) {
           const txt = await response.text();
@@ -1002,12 +1058,17 @@ document.addEventListener("DOMContentLoaded", () => {
           addMessage("QueryBee", "Sorry, I didn't get a response.", "bot");
         }
         hideTypingIndicator();
+        setSendingState(false);
       })
       .catch(error => {
+        clearTimeout(timeoutId);
         console.error("Error calling backend:", error);
-        const errMsg = error && error.message ? error.message : "Sorry, something went wrong.";
+        const errMsg = error && error.name === 'AbortError'
+          ? 'Request timed out. Please try again.'
+          : (error && error.message ? error.message : "Sorry, something went wrong.");
         addMessage("QueryBee", errMsg, "bot");
         hideTypingIndicator();
+        setSendingState(false);
       });
   }
 
