@@ -15,9 +15,10 @@ if (!process.env.VERCEL) {
 let cachedToken = null;
 let tokenExpiry = null;
 let authClientPromise = null;
+ const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000;
 
 async function getAccessToken() {
-  if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
+  if (cachedToken && tokenExpiry && Date.now() < (tokenExpiry - TOKEN_EXPIRY_BUFFER_MS)) {
     return cachedToken;
   }
   
@@ -108,6 +109,36 @@ app.get('/api/token', async (req, res) => {
   }
 });
 
+app.get('/api/token-status', async (req, res) => {
+  try {
+    const hasManualToken = !!(process.env.DIALOGFLOW_ACCESS_TOKEN && process.env.DIALOGFLOW_ACCESS_TOKEN.trim());
+    const hasServiceAccountJson = !!(process.env.GOOGLE_CREDS_JSON && process.env.GOOGLE_CREDS_JSON.trim().startsWith('{'));
+    const hasGoogleAppCreds = !!process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+    const status = {
+      projectId: PROJECT_ID,
+      knowledgeBaseId: KNOWLEDGE_BASE_ID,
+      hasManualToken,
+      hasServiceAccountJson,
+      hasGoogleAppCreds,
+      cachedToken: !!cachedToken,
+      tokenExpiryMs: tokenExpiry,
+      tokenExpiresInSeconds: tokenExpiry ? Math.max(0, Math.floor((tokenExpiry - Date.now()) / 1000)) : null,
+    };
+
+    if (!hasManualToken) {
+      await getAccessToken();
+      status.cachedToken = !!cachedToken;
+      status.tokenExpiryMs = tokenExpiry;
+      status.tokenExpiresInSeconds = tokenExpiry ? Math.max(0, Math.floor((tokenExpiry - Date.now()) / 1000)) : null;
+    }
+
+    res.json({ status: 'ok', ...status });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
 app.post('/api/dialogflow', async (req, res) => {
   try {
     const userQuery = req.body.query;
@@ -116,9 +147,9 @@ app.post('/api/dialogflow', async (req, res) => {
       return res.status(400).json({ error: "Missing 'query' in request body" });
     }
 
-    const accessToken = ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0
-  ? (() => { console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'); return ACCESS_TOKEN.trim(); })()
-  : (() => { console.log('Falling back to auto-generated token from service account'); return getAccessToken(); })();
+    const accessToken = (ACCESS_TOKEN && ACCESS_TOKEN.trim().length > 0)
+      ? (console.log('Using manual DIALOGFLOW_ACCESS_TOKEN'), ACCESS_TOKEN.trim())
+      : (console.log('Falling back to auto-generated token from service account'), await getAccessToken());
 
     const dialogflowUrl = `https://dialogflow.googleapis.com/v2beta1/projects/${PROJECT_ID}/agent/sessions/${sessionId}:detectIntent`;
     const kbPath = `projects/${PROJECT_ID}/knowledgeBases/${KNOWLEDGE_BASE_ID}`;
