@@ -719,7 +719,7 @@ export function QueryBeeWidget() {
             animate={{ y: [0, -2, 0] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <MessageSquare className="h-6 w-6" />
+            <img src="/QueryBeeLogo.png" alt="QueryBee" className="h-6 w-6" />
           </motion.div>
         </motion.button>
 
@@ -750,7 +750,7 @@ export function QueryBeeWidget() {
                 <div className="relative flex items-center justify-between gap-2 border-b border-[hsl(var(--qb-border))] bg-[rgba(0,0,0,0.15)] px-3 py-2">
                   <div className="flex items-center gap-2">
                     <div className="grid h-9 w-9 place-items-center rounded-[14px] bg-white/10">
-                      <span aria-hidden="true">🤖</span>
+                      <img src="/QueryBeeLogo.png" alt="QueryBee" className="h-7 w-7" />
                     </div>
                     <div className="leading-tight">
                       <div className="flex items-center gap-2">
