@@ -844,12 +844,21 @@ export function QueryBeeWidget() {
                               'max-w-[85%] rounded-[16px] border px-3 py-2 shadow-sm',
                               m.type === 'user'
                                 ? 'border-transparent bg-[hsl(var(--qb-accent))] text-[hsl(var(--qb-accent-fg))]'
-                                : 'border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] text-[hsl(var(--qb-fg))]'
+                                : (theme.mode || 'dark') === 'dark'
+                                  ? 'border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] text-[hsl(var(--qb-fg))]'
+                                  : 'border-gray-300 bg-white text-gray-900'
                             )}
                           >
                             <div className="text-[length:var(--qb-font-size)] leading-relaxed">{m.text}</div>
                             <div className="mt-2 flex items-center justify-between gap-2">
-                              <div className={cn('text-[10px] opacity-80')}>
+                              <div className={cn(
+                                'text-[10px] opacity-80',
+                                m.type === 'user'
+                                  ? 'text-[hsl(var(--qb-accent-fg))]'
+                                  : (theme.mode || 'dark') === 'dark'
+                                    ? 'text-[hsl(var(--qb-muted-fg))]'
+                                    : 'text-gray-500'
+                              )}>
                                 {formatTime(m.timestamp)}
                               </div>
                               {m.type === 'bot' && (
@@ -857,7 +866,10 @@ export function QueryBeeWidget() {
                                   {'speechSynthesis' in window && (
                                     <button
                                       className={cn(
-                                        'grid h-7 w-7 place-items-center rounded-[10px] border border-[hsl(var(--qb-border))] bg-transparent text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-muted))]'
+                                        'grid h-7 w-7 place-items-center rounded-[10px] border transition-colors',
+                                        (theme.mode || 'dark') === 'dark'
+                                          ? 'border-[hsl(var(--qb-border))] bg-transparent text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-muted))]'
+                                          : 'border-gray-300 bg-transparent text-gray-600 hover:bg-gray-100'
                                       )}
                                       onClick={() => toggleSpeech(m)}
                                       title={
@@ -876,11 +888,14 @@ export function QueryBeeWidget() {
 
                                   <button
                                     className={cn(
-                                      'grid h-7 w-7 place-items-center rounded-[10px] border border-[hsl(var(--qb-border))] bg-transparent',
+                                      'grid h-7 w-7 place-items-center rounded-[10px] border transition-colors',
+                                      (theme.mode || 'dark') === 'dark'
+                                        ? 'border-[hsl(var(--qb-border))] bg-transparent'
+                                        : 'border-gray-300 bg-transparent',
                                       m.feedback === 'up'
-                                        ? 'text-emerald-400'
-                                        : 'text-[hsl(var(--qb-muted-fg))]',
-                                      'hover:bg-[hsl(var(--qb-muted))]'
+                                        ? (theme.mode || 'dark') === 'dark' ? 'text-emerald-400' : 'text-emerald-600'
+                                        : (theme.mode || 'dark') === 'dark' ? 'text-[hsl(var(--qb-muted-fg))]' : 'text-gray-600',
+                                      (theme.mode || 'dark') === 'dark' ? 'hover:bg-[hsl(var(--qb-muted))]' : 'hover:bg-gray-100'
                                     )}
                                     onClick={() => setFeedback(m.id, 'up')}
                                     title="Helpful"
@@ -889,11 +904,14 @@ export function QueryBeeWidget() {
                                   </button>
                                   <button
                                     className={cn(
-                                      'grid h-7 w-7 place-items-center rounded-[10px] border border-[hsl(var(--qb-border))] bg-transparent',
+                                      'grid h-7 w-7 place-items-center rounded-[10px] border transition-colors',
+                                      (theme.mode || 'dark') === 'dark'
+                                        ? 'border-[hsl(var(--qb-border))] bg-transparent'
+                                        : 'border-gray-300 bg-transparent',
                                       m.feedback === 'down'
-                                        ? 'text-rose-400'
-                                        : 'text-[hsl(var(--qb-muted-fg))]',
-                                      'hover:bg-[hsl(var(--qb-muted))]'
+                                        ? (theme.mode || 'dark') === 'dark' ? 'text-rose-400' : 'text-rose-600'
+                                        : (theme.mode || 'dark') === 'dark' ? 'text-[hsl(var(--qb-muted-fg))]' : 'text-gray-600',
+                                      (theme.mode || 'dark') === 'dark' ? 'hover:bg-[hsl(var(--qb-muted))]' : 'hover:bg-gray-100'
                                     )}
                                     onClick={() => setFeedback(m.id, 'down')}
                                     title="Not helpful"
@@ -1082,8 +1100,8 @@ export function QueryBeeWidget() {
                         role="switch"
                         aria-checked={(theme.mode || 'dark') === 'dark'}
                         className={cn(
-                          'relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus:outline-none',
-                          (theme.mode || 'dark') === 'dark' ? 'bg-[hsl(var(--qb-accent))]' : 'bg-gray-300'
+                          'relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--qb-accent))]/50',
+                          (theme.mode || 'dark') === 'dark' ? 'bg-[hsl(var(--qb-accent))]' : 'bg-gray-400'
                         )}
                         onClick={() => {
                           const mode = (theme.mode || 'dark') === 'dark' ? 'light' : 'dark';
@@ -1105,12 +1123,15 @@ export function QueryBeeWidget() {
                       >
                         <span
                           className={cn(
-                            'inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300',
-                            (theme.mode || 'dark') === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                            'inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300',
+                            (theme.mode || 'dark') === 'dark' ? 'translate-x-5' : 'translate-x-0.5'
                           )}
                         />
                       </button>
-                      <span className="ml-2 text-[11px] text-[hsl(var(--qb-muted-fg))]">
+                      <span className={cn(
+                        'ml-2 text-[11px] font-medium',
+                        (theme.mode || 'dark') === 'dark' ? 'text-white' : 'text-gray-700'
+                      )}>
                         {(theme.mode || 'dark') === 'dark' ? 'Dark' : 'Light'}
                       </span>
                     </div>
