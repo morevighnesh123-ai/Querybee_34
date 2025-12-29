@@ -1151,7 +1151,7 @@ export function QueryBeeWidget() {
                                 className="rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 py-2 text-left text-[12px] hover:bg-[hsl(var(--qb-muted))]"
                                 onClick={() => setTheme((prev) => ({ ...prev, ...p.theme }))}
                               >
-                                <div className="font-medium">{p.name}</div>
+                                <div className="font-medium text-white">{p.name}</div>
                               </button>
                             ))}
                           </div>
