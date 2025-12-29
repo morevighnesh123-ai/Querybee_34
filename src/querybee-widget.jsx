@@ -302,11 +302,11 @@ export function QueryBeeWidget() {
   }, []);
 
   useEffect(() => {
-    setDragEnabled(!isTouchDevice && !expanded);
+    setDragEnabled(!expanded);
   }, [isTouchDevice]);
 
   useEffect(() => {
-    setDragEnabled(!isTouchDevice && !expanded);
+    setDragEnabled(!expanded);
   }, [isTouchDevice, expanded]);
 
   useEffect(() => {
