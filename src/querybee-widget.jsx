@@ -1074,15 +1074,19 @@ export function QueryBeeWidget() {
                     Powered by <span className="font-medium text-[hsl(var(--qb-fg))]">🤖 Vighnesh More</span>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between gap-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <div className="text-[11px] text-[hsl(var(--qb-muted-fg))]">Theme</div>
-                    <label className="flex items-center gap-2 text-[11px] text-[hsl(var(--qb-muted-fg))]">
-                      <span>Light</span>
-                      <input
-                        type="checkbox"
-                        checked={(theme.mode || 'dark') === 'dark'}
-                        onChange={(e) => {
-                          const mode = e.target.checked ? 'dark' : 'light';
+                    <div className="relative flex items-center">
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={(theme.mode || 'dark') === 'dark'}
+                        className={cn(
+                          'relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus:outline-none',
+                          (theme.mode || 'dark') === 'dark' ? 'bg-[hsl(var(--qb-accent))]' : 'bg-gray-300'
+                        )}
+                        onClick={() => {
+                          const mode = (theme.mode || 'dark') === 'dark' ? 'light' : 'dark';
                           const preset = mode === 'dark' ? THEME_PRESETS[0]?.theme : THEME_PRESETS[1]?.theme;
                           if (preset) {
                             setTheme((prev) => ({
@@ -1098,17 +1102,26 @@ export function QueryBeeWidget() {
                             setTheme((prev) => ({ ...prev, mode }));
                           }
                         }}
-                      />
-                      <span>Dark</span>
-                    </label>
+                      >
+                        <span
+                          className={cn(
+                            'inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300',
+                            (theme.mode || 'dark') === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                          )}
+                        />
+                      </button>
+                      <span className="ml-2 text-[11px] text-[hsl(var(--qb-muted-fg))]">
+                        {(theme.mode || 'dark') === 'dark' ? 'Dark' : 'Light'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {!expanded && !isTouchDevice && (
                 <div
-                  className="absolute bottom-2 right-2 grid h-6 w-6 cursor-nwse-resize place-items-center rounded-[10px] border border-[hsl(var(--qb-border))] bg-white/5 text-[hsl(var(--qb-muted-fg))]"
-                  style={{ zIndex: 15 }}
+                  className="absolute bottom-2 right-2 grid h-6 w-6 cursor-nwse-resize place-items-center rounded-[10px] border border-[hsl(var(--qb-border))] bg-white/5"
+                  style={{ zIndex: 15, color: (theme.mode || 'dark') === 'dark' ? 'white' : 'black' }}
                   onPointerDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
