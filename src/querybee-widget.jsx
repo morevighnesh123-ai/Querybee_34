@@ -1124,7 +1124,7 @@ export function QueryBeeWidget() {
                         <span
                           className={cn(
                             'inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300',
-                            (theme.mode || 'dark') === 'dark' ? 'translate-x-6' : 'translate-x-0'
+                            (theme.mode || 'dark') === 'dark' ? 'translate-x-7' : 'translate-x-0'
                           )}
                         />
                       </button>
