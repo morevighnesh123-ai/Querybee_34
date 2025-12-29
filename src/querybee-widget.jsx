@@ -707,7 +707,7 @@ export function QueryBeeWidget() {
         <motion.button
           onClick={toggleOpen}
           className={cn(
-            'qb-motion relative overflow-hidden rounded-[20px] border border-[hsl(var(--qb-border))] shadow-[0_16px_40px_rgba(0,0,0,0.28)]',
+            'qb-motion relative grid place-items-center rounded-full border border-[hsl(var(--qb-border))] bg-gradient-to-br from-[hsl(var(--qb-accent))] to-[#7c3aed] text-[hsl(var(--qb-accent-fg))] shadow-[0_16px_40px_rgba(0,0,0,0.28)]',
             open ? 'h-11 w-11' : 'h-14 w-14'
           )}
           style={{ zIndex: 20, position: 'absolute', right: 0, bottom: 0 }}
@@ -718,9 +718,8 @@ export function QueryBeeWidget() {
           <motion.div
             animate={{ y: [0, -2, 0] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-full h-full flex items-center justify-center"
           >
-            <img src="/QueryBeeLogo.png" alt="QueryBee" className="w-full h-full object-cover" />
+            <MessageSquare className="h-6 w-6" />
           </motion.div>
         </motion.button>
 
