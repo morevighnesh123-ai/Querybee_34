@@ -1143,7 +1143,7 @@ export function QueryBeeWidget() {
                     <TabsContent value="theme">
                       <div className="mt-2 grid gap-3">
                         <div className="grid gap-2">
-                          <div className="text-sm font-medium">Presets</div>
+                          <div className="text-sm font-medium text-white">Presets</div>
                           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                             {THEME_PRESETS.map((p) => (
                               <button
@@ -1159,8 +1159,8 @@ export function QueryBeeWidget() {
 
                         <div className="flex items-center justify-between gap-3 rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 py-2">
                           <div>
-                            <div className="text-sm font-medium">Light / Dark</div>
-                            <div className="text-[12px] text-[hsl(var(--qb-muted-fg))]">Switch base appearance.</div>
+                            <div className="text-sm font-medium text-white">Light / Dark</div>
+                            <div className="text-[12px] text-white/60">Switch base appearance.</div>
                           </div>
                           <label className="flex items-center gap-2 text-sm">
                             <span className="text-[12px] text-[hsl(var(--qb-muted-fg))]">Light</span>
@@ -1178,7 +1178,7 @@ export function QueryBeeWidget() {
                         </div>
 
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Accent color</div>
+                          <div className="text-sm font-medium text-white">Accent color</div>
                           <div className="flex items-center gap-3">
                             <input
                               type="color"
@@ -1194,7 +1194,7 @@ export function QueryBeeWidget() {
                         </div>
 
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Text color</div>
+                          <div className="text-sm font-medium text-white">Text color</div>
                           <div className="flex items-center gap-3">
                             <input
                               type="color"
@@ -1210,7 +1210,7 @@ export function QueryBeeWidget() {
                         </div>
 
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Glass intensity</div>
+                          <div className="text-sm font-medium text-white">Glass intensity</div>
                           <input
                             type="range"
                             min={0.7}
@@ -1222,7 +1222,7 @@ export function QueryBeeWidget() {
                         </div>
 
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Glass blur</div>
+                          <div className="text-sm font-medium text-white">Glass blur</div>
                           <input
                             type="range"
                             min={0}
@@ -1234,7 +1234,7 @@ export function QueryBeeWidget() {
                         </div>
 
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Corner radius</div>
+                          <div className="text-sm font-medium text-white">Corner radius</div>
                           <input
                             type="range"
                             min={12}
@@ -1249,7 +1249,7 @@ export function QueryBeeWidget() {
                     <TabsContent value="typography">
                       <div className="mt-2 grid gap-3">
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Font</div>
+                          <div className="text-sm font-medium text-white">Font</div>
                           <select
                             value={theme.font}
                             onChange={(e) => setTheme((p) => ({ ...p, font: e.target.value }))}
@@ -1272,8 +1272,8 @@ export function QueryBeeWidget() {
 
                         <div className="grid gap-1">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-sm font-medium">Font size</div>
-                            <div className="text-[12px] text-[hsl(var(--qb-muted-fg))]">{Math.round(theme.fontSize ?? 13)}px</div>
+                            <div className="text-sm font-medium text-white">Font size</div>
+                            <div className="text-[12px] text-white/60">{Math.round(theme.fontSize ?? 13)}px</div>
                           </div>
                           <input
                             type="range"
@@ -1289,7 +1289,7 @@ export function QueryBeeWidget() {
                     <TabsContent value="voice">
                       <div className="mt-2 grid gap-3">
                         <div className="grid gap-1">
-                          <div className="text-sm font-medium">Speech voice</div>
+                          <div className="text-sm font-medium text-white">Speech voice</div>
                           <select
                             value={theme.voiceUri || ''}
                             onChange={(e) => setTheme((p) => ({ ...p, voiceUri: e.target.value }))}
