@@ -1254,17 +1254,27 @@ export function QueryBeeWidget() {
                       <div className="mt-2 grid gap-3">
                         <div className="grid gap-2">
                           <div className="text-sm font-medium text-white">Presets</div>
-                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          <select
+                            value={THEME_PRESETS.find(p => 
+                              p.theme.mode === theme.mode && 
+                              p.theme.accent === theme.accent &&
+                              p.theme.bg === theme.bg
+                            )?.id || 'custom'}
+                            onChange={(e) => {
+                              const preset = THEME_PRESETS.find(p => p.id === e.target.value);
+                              if (preset) {
+                                setTheme((prev) => ({ ...prev, ...preset.theme }));
+                              }
+                            }}
+                            className="h-10 w-full rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 text-sm text-white"
+                          >
+                            <option value="custom" className="text-gray-800">Custom</option>
                             {THEME_PRESETS.map((p) => (
-                              <button
-                                key={p.id}
-                                className="rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 py-2 text-left text-[12px] hover:bg-[hsl(var(--qb-muted))]"
-                                onClick={() => setTheme((prev) => ({ ...prev, ...p.theme }))}
-                              >
-                                <div className="font-medium text-white">{p.name}</div>
-                              </button>
+                              <option key={p.id} value={p.id} className="text-gray-800">
+                                {p.name}
+                              </option>
                             ))}
-                          </div>
+                          </select>
                         </div>
 
                         <div className="flex items-center justify-between gap-3 rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 py-2">
