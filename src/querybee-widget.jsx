@@ -664,7 +664,7 @@ export function QueryBeeWidget() {
   }
 
   function getPanelPosition(bubblePos, panelSize) {
-    if (!bubblePos || !panelSize) return { left: 0, top: 'auto', bottom: 64 };
+    if (!bubblePos || !panelSize) return { left: 16, top: 'auto', bottom: 64 };
     
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -673,22 +673,30 @@ export function QueryBeeWidget() {
     // Check if bubble is on the right side of viewport
     const isRightSide = bubbleCenterX > viewportWidth / 2;
     
-    // Calculate panel position to align with bubble
+    // Calculate panel position to align with bubble while staying in viewport
     if (isRightSide) {
       // Position panel at right edge, aligned with bubble right edge
       const bubbleRight = bubblePos.x + 56;
-      const panelRight = Math.min(bubbleRight, viewportWidth - 16);
+      const maxPanelRight = viewportWidth - 16; // 16px padding from right edge
+      const panelRight = Math.min(bubbleRight, maxPanelRight);
       const rightPos = viewportWidth - panelRight;
+      
+      // Ensure panel doesn't go off left edge either
+      const panelLeft = viewportWidth - panelRight - panelSize.w;
+      const adjustedRight = panelLeft < 16 ? viewportWidth - (panelSize.w + 16) : rightPos;
+      
       return { 
         left: 'auto', 
-        right: `${rightPos}px`, 
+        right: `${adjustedRight}px`, 
         top: 'auto', 
         bottom: `${viewportHeight - bubblePos.y + 8}px`
       };
     } else {
       // Position panel at left edge, aligned with bubble left edge
       const bubbleLeft = bubblePos.x;
-      const panelLeft = Math.max(bubbleLeft, 16);
+      const maxPanelLeft = viewportWidth - panelSize.w - 16; // Maximum left position
+      const panelLeft = Math.min(Math.max(bubbleLeft, 16), maxPanelLeft);
+      
       return { 
         left: `${panelLeft}px`, 
         right: 'auto', 
