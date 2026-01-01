@@ -663,6 +663,42 @@ export function QueryBeeWidget() {
     };
   }
 
+  function getPanelPosition(bubblePos, panelSize) {
+    if (!bubblePos || !panelSize) return { left: 0, top: 'auto', bottom: 64 };
+    
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const bubbleCenterX = bubblePos.x + 28; // Half of bubble width (56)
+    const bubbleCenterY = bubblePos.y + 28;
+    
+    // Check if bubble is on the right side of viewport
+    const isRightSide = bubbleCenterX > viewportWidth / 2;
+    
+    // Calculate panel position
+    let left, top, bottom;
+    
+    if (isRightSide) {
+      // Position panel at right edge
+      left = 'auto';
+      const rightPos = Math.min(viewportWidth - bubblePos.x - 56, viewportWidth - panelSize.w - 16);
+      return { 
+        left: 'auto', 
+        right: `${rightPos}px`, 
+        top: 'auto', 
+        bottom: `${viewportHeight - bubblePos.y + 8}px`
+      };
+    } else {
+      // Position panel at left edge
+      left = `${bubblePos.x}px`;
+      return { 
+        left: `${left}px`, 
+        right: 'auto', 
+        top: 'auto', 
+        bottom: `${viewportHeight - bubblePos.y + 8}px`
+      };
+    }
+  }
+
   function clearChat() {
     if (!messages.length) {
       setMessages([]);
@@ -855,16 +891,16 @@ export function QueryBeeWidget() {
               variants={panelVariants}
               transition={{ type: 'spring', stiffness: 380, damping: 32 }}
               className={cn(
-                'qb-motion absolute left-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
+                'qb-motion absolute flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed inset-0 rounded-none z-[10000]' : 'bottom-16'
+                expanded ? 'fixed inset-0 rounded-none z-[10000]' : ''
               )}
               style={
                 expanded
                   ? { overflow: 'hidden' }
                   : isTouchDevice
-                    ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))' }
-                    : { width: `${panelSize.w}px`, height: `${panelSize.h}px` }
+                    ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))', ...getPanelPosition(pos, panelSize) }
+                    : { width: `${panelSize.w}px`, height: `${panelSize.h}px`, ...getPanelPosition(pos, panelSize) }
               }
             >
               <div className="relative">
