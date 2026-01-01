@@ -612,28 +612,26 @@ export function QueryBeeWidget() {
     const panelH = opts?.panelH || bubble;
     const gap = opts?.gap || 0;
 
-    // Get the actual document dimensions, not just window viewport
-    const documentWidth = Math.max(
-      document.documentElement.scrollWidth,
-      document.body.scrollWidth,
-      window.innerWidth
-    );
-    const documentHeight = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-      window.innerHeight
-    );
-
-    // Also consider viewport dimensions for minimum bounds
+    // Use viewport dimensions for fixed positioning
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Use the smaller of document or viewport for maximum bounds to keep logo visible
-    const maxX = Math.max(minX, Math.min(documentWidth - bubble - padding, viewportWidth - bubble - padding));
-    const maxY = Math.max(minY, Math.min(documentHeight - bubble - padding, viewportHeight - bubble - padding));
+    // Calculate bounds relative to viewport
+    const minX = padding;
+    const minY = padding;
+    const maxX = viewportWidth - bubble - padding;
+    const maxY = viewportHeight - bubble - padding;
 
-    const minX = Math.max(padding, panelW - bubble + padding);
-    const minY = Math.max(padding, panelH + gap - bubble + padding);
+    // If panel is open, ensure bubble doesn't overlap with panel
+    if (opts?.panelW && opts?.panelH) {
+      const adjustedMinX = Math.max(minX, opts.panelW + gap);
+      const adjustedMinY = Math.max(minY, opts.panelH + gap - bubble);
+      
+      return {
+        x: Math.max(adjustedMinX, Math.min(next.x, maxX)),
+        y: Math.max(adjustedMinY, Math.min(next.y, maxY)),
+      };
+    }
 
     return {
       x: Math.max(minX, Math.min(next.x, maxX)),
@@ -804,7 +802,7 @@ export function QueryBeeWidget() {
             'qb-motion relative grid place-items-center rounded-full border border-[hsl(var(--qb-border))] bg-gradient-to-br from-[hsl(var(--qb-accent))] to-[#7c3aed] text-[hsl(var(--qb-accent-fg))] shadow-[0_16px_40px_rgba(0,0,0,0.28)]',
             open ? 'h-11 w-11' : 'h-14 w-14'
           )}
-          style={{ zIndex: 20, position: 'absolute', right: 0, bottom: 0 }}
+          style={{ zIndex: 20 }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
           aria-label="Open QueryBee"
