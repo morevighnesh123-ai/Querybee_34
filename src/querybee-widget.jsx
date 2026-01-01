@@ -837,7 +837,13 @@ export function QueryBeeWidget() {
               )}
               style={
                 expanded
-                  ? { width: '100vw', height: '100vh', maxWidth: '100vw', maxHeight: '100vh' }
+                  ? { 
+                      width: '100vw', 
+                      height: '100vh', 
+                      maxWidth: '100vw', 
+                      maxHeight: '100vh',
+                      overflow: 'hidden'
+                    }
                   : isTouchDevice
                     ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))' }
                     : { width: `${panelSize.w}px`, height: `${panelSize.h}px` }
