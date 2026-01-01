@@ -71,9 +71,9 @@ function randomId() {
 }
 
 const DEFAULT_QUICK = [
-  { id: 'q1', text: 'What is QueryBee?' },
-  { id: 'q2', text: 'How does it work?' },
-  { id: 'q3', text: 'What can you help me with?' },
+  { id: 'q1', text: '📚 What courses are offered at MLDC?' },
+  { id: 'q2', text: '🎓 How can I apply for admission?' },
+  { id: 'q3', text: '🏫 Tell me about college facilities' },
 ];
 
 const DEFAULT_THEME = {
@@ -1078,26 +1078,37 @@ export function QueryBeeWidget() {
                       exit={{ opacity: 0, y: 10 }}
                       className="px-3 py-2 bg-transparent"
                     >
-                      <div className="flex flex-col gap-2">
-                        {quick.map((q) => (
-                          <div
+                      <div className="flex flex-col gap-3">
+                        {quick.map((q, index) => (
+                          <motion.div
                             key={q.id}
-                            className="flex items-center justify-between gap-2 px-3 py-2"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="relative overflow-hidden rounded-[20px] border border-[hsl(var(--qb-border)/0.3)] bg-gradient-to-r from-[hsl(var(--qb-card)/0.6)] to-[hsl(var(--qb-card)/0.3)] backdrop-blur-sm hover:from-[hsl(var(--qb-card)/0.8)] hover:to-[hsl(var(--qb-card)/0.5)] transition-all duration-300 group"
                           >
-                            <button
-                              className="flex-1 text-left text-[length:calc(var(--qb-font-size)-1px)] text-[hsl(var(--qb-fg))] font-medium hover:text-[hsl(var(--qb-accent))] transition-colors"
-                              onClick={() => sendMessage(q.text)}
-                            >
-                              {q.text}
-                            </button>
-                            <button
-                              className="grid h-7 w-7 place-items-center rounded-[12px] text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-accent))] hover:text-[hsl(var(--qb-accent-fg))] transition-colors"
-                              onClick={() => setQuick((prev) => prev.filter((x) => x.id !== q.id))}
-                              title="Remove"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--qb-accent)/0.1)] to-[hsl(var(--qb-accent)/0.05)] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div className="relative flex items-center justify-between gap-3 p-4">
+                              <button
+                                className="flex-1 text-left text-[length:calc(var(--qb-font-size)+1px)] text-[hsl(var(--qb-fg))] font-semibold hover:text-[hsl(var(--qb-accent))] transition-all duration-300 group-hover:translate-x-1"
+                                onClick={() => sendMessage(q.text)}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span className="text-lg">{q.text.split(' ')[0]}</span>
+                                  <span className="text-[length:calc(var(--qb-font-size)-1px)] font-normal opacity-80">
+                                    {q.text.split(' ').slice(1).join(' ')}
+                                  </span>
+                                </span>
+                              </button>
+                              <button
+                                className="grid h-8 w-8 place-items-center rounded-[16px] border border-[hsl(var(--qb-border)/0.5)] text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-accent))] hover:text-[hsl(var(--qb-accent-fg))] hover:border-[hsl(var(--qb-accent))] transition-all duration-300 group-hover:scale-110"
+                                onClick={() => setQuick((prev) => prev.filter((x) => x.id !== q.id))}
+                                title="Remove suggestion"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </motion.div>
                         ))}
                       </div>
                     </motion.div>
