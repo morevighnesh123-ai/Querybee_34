@@ -1076,13 +1076,13 @@ export function QueryBeeWidget() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="border-t border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card)/0.5)] backdrop-blur-sm px-3 py-2"
+                      className="border-t border-[hsl(var(--qb-border))] px-3 py-2"
                     >
                       <div className="flex flex-col gap-2">
                         {quick.map((q) => (
                           <div
                             key={q.id}
-                            className="flex items-center justify-between gap-2 rounded-[14px] border border-[hsl(var(--qb-border))/0.5] bg-[hsl(var(--qb-card))/0.8] backdrop-blur-sm px-3 py-2 shadow-sm hover:bg-[hsl(var(--qb-card))/0.9] transition-colors"
+                            className="flex items-center justify-between gap-2 rounded-[14px] border border-[hsl(var(--qb-border))/0.5] px-3 py-2 transition-colors"
                           >
                             <button
                               className="flex-1 text-left text-[length:calc(var(--qb-font-size)-1px)] text-[hsl(var(--qb-fg))] font-medium hover:text-[hsl(var(--qb-accent))] transition-colors"
