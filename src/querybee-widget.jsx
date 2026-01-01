@@ -811,11 +811,11 @@ export function QueryBeeWidget() {
               className={cn(
                 'qb-motion absolute right-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed left-0 right-0 top-0 bottom-0 w-auto rounded-none' : 'bottom-16'
+                expanded ? 'fixed inset-0 w-auto h-auto rounded-none z-[9998]' : 'bottom-16'
               )}
               style={
                 expanded
-                  ? undefined
+                  ? { width: '100vw', height: '100vh', maxWidth: '100vw', maxHeight: '100vh' }
                   : isTouchDevice
                     ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))' }
                     : { width: `${panelSize.w}px`, height: `${panelSize.h}px` }
