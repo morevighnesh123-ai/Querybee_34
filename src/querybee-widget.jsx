@@ -833,15 +833,16 @@ export function QueryBeeWidget() {
               className={cn(
                 'qb-motion absolute right-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed inset-0 w-auto h-auto rounded-none z-[10000]' : 'bottom-16'
+                expanded ? 'absolute inset-0 w-auto h-auto rounded-none z-[10000]' : 'bottom-16'
               )}
               style={
                 expanded
                   ? { 
-                      width: '100vw', 
-                      height: '100vh', 
-                      maxWidth: '100vw', 
-                      maxHeight: '100vh',
+                      width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth) + 'px',
+                      height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight) + 'px',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
                       overflow: 'hidden'
                     }
                   : isTouchDevice
