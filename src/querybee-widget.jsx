@@ -612,10 +612,28 @@ export function QueryBeeWidget() {
     const panelH = opts?.panelH || bubble;
     const gap = opts?.gap || 0;
 
+    // Get the actual document dimensions, not just window viewport
+    const documentWidth = Math.max(
+      document.documentElement.scrollWidth,
+      document.body.scrollWidth,
+      window.innerWidth
+    );
+    const documentHeight = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
+
+    // Also consider viewport dimensions for minimum bounds
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Use the smaller of document or viewport for maximum bounds to keep logo visible
+    const maxX = Math.max(minX, Math.min(documentWidth - bubble - padding, viewportWidth - bubble - padding));
+    const maxY = Math.max(minY, Math.min(documentHeight - bubble - padding, viewportHeight - bubble - padding));
+
     const minX = Math.max(padding, panelW - bubble + padding);
     const minY = Math.max(padding, panelH + gap - bubble + padding);
-    const maxX = Math.max(minX, window.innerWidth - bubble - padding);
-    const maxY = Math.max(minY, window.innerHeight - bubble - padding);
 
     return {
       x: Math.max(minX, Math.min(next.x, maxX)),
