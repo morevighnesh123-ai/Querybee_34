@@ -1193,7 +1193,7 @@ export function QueryBeeWidget() {
                   <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-[hsl(var(--qb-muted-fg))]">
                     <div>
                       By chatting, you agree to our{' '}
-                      <a href="terms.html" className="underline decoration-white/20 hover:decoration-white/60">
+                      <a href="/privacy-policy.html" className="underline decoration-white/20 hover:decoration-white/60">
                         privacy policy
                       </a>
                       .
