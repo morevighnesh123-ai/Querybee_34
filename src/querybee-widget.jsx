@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue } from 'framer-motion';
 import {
   MessageSquare,
   Send,
@@ -356,18 +356,42 @@ export function QueryBeeWidget() {
   const listRef = useRef(null);
   const inputRef = useRef(null);
 
+  const bubbleRef = useRef(null);
+  const bubbleX = useMotionValue(0);
+  const bubbleY = useMotionValue(0);
+
   const [dragEnabled, setDragEnabled] = useState(false);
   const [pos, setPos] = useState(() => {
     try {
       const raw = localStorage.getItem('querybee_position');
-      if (!raw) return null;
+      if (!raw) {
+        if (typeof window === 'undefined') return null;
+        return { x: 18, y: window.innerHeight - 56 - 18 };
+      }
       const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed.x !== 'number' || typeof parsed.y !== 'number') return null;
+      if (!parsed || typeof parsed.x !== 'number' || typeof parsed.y !== 'number') {
+        if (typeof window === 'undefined') return null;
+        return { x: 18, y: window.innerHeight - 56 - 18 };
+      }
       return parsed;
     } catch {
-      return null;
+      if (typeof window === 'undefined') return null;
+      return { x: 18, y: window.innerHeight - 56 - 18 };
     }
   });
+
+  useEffect(() => {
+    setPos((p) => {
+      const base = p || { x: 18, y: window.innerHeight - 56 - 18 };
+      const next = clampBubblePos(base, { panelW: 56, panelH: 56 });
+      try {
+        localStorage.setItem('querybee_position', JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
 
   const isTouchDevice = useMemo(() => {
     return (
@@ -451,7 +475,7 @@ export function QueryBeeWidget() {
     const onResize = () => {
       if (!pos) return;
       const next = open && !expanded
-        ? clampBubblePos(pos, { panelW: panelSize.w, panelH: panelSize.h })
+        ? clampBubblePos(pos, { panelW: panelSize.w, panelH: panelSize.h, keepPanelInView: true })
         : clampBubblePos(pos, { panelW: 56, panelH: 56 });
       if (next.x !== pos.x || next.y !== pos.y) {
         setPos(next);
@@ -597,6 +621,16 @@ export function QueryBeeWidget() {
     setOpen((v) => {
       const next = !v;
       if (next) {
+        setPos((p) => {
+          if (!p) return p;
+          const nextPos = clampBubblePos(p, { panelW: panelSize.w, panelH: panelSize.h, gap: 16, keepPanelInView: true });
+          try {
+            localStorage.setItem('querybee_position', JSON.stringify(nextPos));
+          } catch {
+            // ignore
+          }
+          return nextPos;
+        });
         setTimeout(() => maybeGreeting(), 150);
       } else {
         setExpanded(false);
@@ -611,26 +645,16 @@ export function QueryBeeWidget() {
     const panelW = opts?.panelW || bubble;
     const panelH = opts?.panelH || bubble;
     const gap = opts?.gap || 0;
-
-    // Use viewport dimensions for fixed positioning
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-
-    // Calculate bounds relative to viewport
-    const minX = padding;
-    const minY = padding;
-    const maxX = viewportWidth - bubble - padding;
-    const maxY = viewportHeight - bubble - padding;
-
-    // If panel is open, ensure bubble doesn't overlap with panel
-    if (opts?.panelW && opts?.panelH) {
-      const adjustedMinX = Math.max(minX, opts.panelW + gap);
-      const adjustedMinY = Math.max(minY, opts.panelH + gap - bubble);
-      
-      return {
-        x: Math.max(adjustedMinX, Math.min(next.x, maxX)),
-        y: Math.max(adjustedMinY, Math.min(next.y, maxY)),
-      };
+    let minX = padding;
+    let minY = padding;
+    let maxX = viewportWidth - bubble - padding;
+    let maxY = viewportHeight - bubble - padding;
+    if (opts?.keepPanelInView && typeof panelW === 'number' && typeof panelH === 'number') {
+      const panelBottomOffset = 8;
+      maxX = Math.min(maxX, viewportWidth - panelW - padding);
+      minY = Math.max(minY, panelH + panelBottomOffset + padding);
     }
 
     return {
@@ -782,33 +806,33 @@ export function QueryBeeWidget() {
     <div className="qb-surface" style={themeStyle}>
       <motion.div
         className="fixed z-[9999] relative h-14 w-14"
-        style={pos ? { left: pos.x, top: pos.y } : { right: 18, bottom: 18 }}
+        ref={bubbleRef}
+        style={pos ? { left: pos.x, top: pos.y, x: bubbleX, y: bubbleY } : { left: 18, bottom: 18, x: bubbleX, y: bubbleY }}
         drag={dragEnabled && !open && !expanded}
         dragMomentum={false}
         dragElastic={0.12}
         onDragEnd={(e, info) => {
           if (!dragEnabled) return;
-          // Convert page coordinates to viewport coordinates
-          const scrollX = window.pageXOffset;
-          const scrollY = window.pageYOffset;
-          const nextRaw = { 
-            x: info.point.x - scrollX, 
-            y: info.point.y - scrollY 
-          };
+          const rect = bubbleRef.current?.getBoundingClientRect?.();
+          const nextRaw = rect ? { x: rect.left, y: rect.top } : { x: info.point.x, y: info.point.y };
           const next = open && !expanded
-            ? clampBubblePos(nextRaw, { panelW: panelSize.w, panelH: panelSize.h, gap: 16 })
+            ? clampBubblePos(nextRaw, { panelW: panelSize.w, panelH: panelSize.h, gap: 16, keepPanelInView: true })
             : clampBubblePos(nextRaw, { panelW: 56, panelH: 56 });
           setPos(next);
           localStorage.setItem('querybee_position', JSON.stringify(next));
+          bubbleX.set(0);
+          bubbleY.set(0);
         }}
       >
         <motion.button
+          layout
           onClick={toggleOpen}
           className={cn(
-            'qb-motion relative grid place-items-center rounded-full border border-[hsl(var(--qb-border))] bg-gradient-to-br from-[hsl(var(--qb-accent))] to-[#7c3aed] text-[hsl(var(--qb-accent-fg))] shadow-[0_16px_40px_rgba(0,0,0,0.28)]',
+            'qb-motion relative grid place-items-center rounded-full border border-[hsl(var(--qb-border))] bg-gradient-to-br from-[hsl(var(--qb-accent))] to-[#7c3aed] text-[hsl(var(--qb-accent-fg))] shadow-[0_16px_40px_rgba(0,0,0,0.28)] will-change-transform',
             open ? 'h-11 w-11' : 'h-14 w-14'
           )}
           style={{ zIndex: 20 }}
+          transition={{ type: 'spring', stiffness: 520, damping: 34 }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
           aria-label="Open QueryBee"
@@ -831,22 +855,13 @@ export function QueryBeeWidget() {
               variants={panelVariants}
               transition={{ type: 'spring', stiffness: 380, damping: 32 }}
               className={cn(
-                'qb-motion absolute right-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
+                'qb-motion absolute left-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed inset-0 w-auto h-auto rounded-none z-[10000]' : 'bottom-16'
+                expanded ? 'fixed inset-0 rounded-none z-[10000]' : 'bottom-16'
               )}
               style={
                 expanded
-                  ? { 
-                      width: '100vw', 
-                      height: '100vh', 
-                      position: 'fixed',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      overflow: 'hidden'
-                    }
+                  ? { overflow: 'hidden' }
                   : isTouchDevice
                     ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))' }
                     : { width: `${panelSize.w}px`, height: `${panelSize.h}px` }
