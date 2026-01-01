@@ -788,7 +788,13 @@ export function QueryBeeWidget() {
         dragElastic={0.12}
         onDragEnd={(e, info) => {
           if (!dragEnabled) return;
-          const nextRaw = { x: info.point.x, y: info.point.y };
+          // Convert page coordinates to viewport coordinates
+          const scrollX = window.pageXOffset;
+          const scrollY = window.pageYOffset;
+          const nextRaw = { 
+            x: info.point.x - scrollX, 
+            y: info.point.y - scrollY 
+          };
           const next = open && !expanded
             ? clampBubblePos(nextRaw, { panelW: panelSize.w, panelH: panelSize.h, gap: 16 })
             : clampBubblePos(nextRaw, { panelW: 56, panelH: 56 });
@@ -827,7 +833,7 @@ export function QueryBeeWidget() {
               className={cn(
                 'qb-motion absolute right-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed inset-0 w-auto h-auto rounded-none z-[9998]' : 'bottom-16'
+                expanded ? 'fixed inset-0 w-auto h-auto rounded-none z-[10000]' : 'bottom-16'
               )}
               style={
                 expanded
