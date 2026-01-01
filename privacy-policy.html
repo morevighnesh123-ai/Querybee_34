@@ -3,71 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - QueryBee Chatbot</title>
+    <title>Privacy Policy - QueryBee Chatbot | M. L. Dahanukar College</title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
         .privacy-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
-            line-height: 1.6;
-        }
-        .privacy-header {
-            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 120px;
             margin-bottom: 40px;
         }
+        
+        .privacy-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+        
         .privacy-header h1 {
             color: #2c3e50;
             font-size: 2.5rem;
+            font-weight: 700;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+        
         .privacy-header p {
             color: #7f8c8d;
             font-size: 1.1rem;
+            font-weight: 500;
         }
+        
+        .privacy-header .last-updated {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+        }
+        
         .section h2 {
             color: #2c3e50;
             font-size: 1.5rem;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+        
+        .section h2 i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
         .section h3 {
             color: #34495e;
             font-size: 1.2rem;
-            margin-top: 20px;
-            margin-bottom: 10px;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #667eea;
         }
+        
         .section p, .section li {
             color: #555;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        
+        .section ul {
+            margin-left: 25px;
+            list-style-type: none;
+        }
+        
+        .section li {
+            position: relative;
+            padding-left: 20px;
             margin-bottom: 10px;
         }
-        .section ul {
-            margin-left: 20px;
+        
+        .section li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
         }
+        
         .highlight {
-            background-color: #e8f4fd;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #3498db;
-            margin: 20px 0;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border: 2px solid #667eea;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .highlight::before {
+            content: "🔒 Important";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .highlight p {
+            margin-top: 15px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
         .back-link {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background: #3498db;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 40px auto;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
+        
         .back-link:hover {
-            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .contact-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .contact-info ul {
+            list-style: none;
+            margin: 0;
+        }
+        
+        .contact-info li {
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+            margin-left: 0;
+        }
+        
+        .contact-info li::before {
+            content: none;
+        }
+        
+        .contact-info li:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-info strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .privacy-container {
+                margin: 100px 20px 20px;
+                padding: 20px;
+            }
+            
+            .privacy-header h1 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .section h2 {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
@@ -115,17 +278,17 @@
         <div class="privacy-header">
             <h1>Privacy Policy</h1>
             <p>QueryBee Chatbot - M. L. Dahanukar College of Commerce</p>
-            <p><strong>Last Updated:</strong> January 1, 2026</p>
+            <span class="last-updated">Last Updated: January 2, 2026</span>
         </div>
 
         <div class="section">
-            <h2>1. Introduction</h2>
-            <p>Welcome to QueryBee, the AI-powered chatbot assistant for M. L. Dahanukar College of Commerce. This Privacy Policy explains how we collect, use, store, and protect your information when you interact with our chatbot service.</p>
+            <h2><i class="fas fa-shield-alt"></i> 1. Introduction</h2>
+            <p>Welcome to QueryBee, your AI-powered chatbot assistant for M. L. Dahanukar College of Commerce. This Privacy Policy explains how we collect, use, store, and protect your information when you interact with our chatbot service.</p>
             <p>By using QueryBee, you agree to the collection and use of information in accordance with this policy.</p>
         </div>
 
         <div class="section">
-            <h2>2. Information We Collect</h2>
+            <h2><i class="fas fa-database"></i> 2. Information We Collect</h2>
             
             <h3>2.1. Chat Conversations</h3>
             <ul>
@@ -151,7 +314,7 @@
         </div>
 
         <div class="section">
-            <h2>3. How We Use Your Information</h2>
+            <h2><i class="fas fa-cogs"></i> 3. How We Use Your Information</h2>
             
             <h3>3.1. Service Provision</h3>
             <ul>
@@ -176,7 +339,7 @@
         </div>
 
         <div class="section">
-            <h2>4. Data Storage and Security</h2>
+            <h2><i class="fas fa-lock"></i> 4. Data Storage and Security</h2>
             
             <h3>4.1. Storage Duration</h3>
             <ul>
@@ -194,12 +357,12 @@
             </ul>
 
             <div class="highlight">
-                <strong>Important:</strong> Your chat conversations are primarily stored locally in your browser. You can clear your chat history at any time using the "Clear" button in the chatbot interface.
+                <p><strong>Important:</strong> Your chat conversations are primarily stored locally in your browser. You can clear your chat history at any time using the "Clear" button in the chatbot interface.</p>
             </div>
         </div>
 
         <div class="section">
-            <h2>5. Data Sharing and Disclosure</h2>
+            <h2><i class="fas fa-share-alt"></i> 5. Data Sharing and Disclosure</h2>
             
             <h3>5.1. We Do Not Sell Your Information</h3>
             <p>QueryBee does not sell, rent, or trade your personal information with third parties.</p>
@@ -216,7 +379,7 @@
         </div>
 
         <div class="section">
-            <h2>6. Your Rights and Choices</h2>
+            <h2><i class="fas fa-user-shield"></i> 6. Your Rights and Choices</h2>
             
             <h3>6.1. Access and Control</h3>
             <ul>
@@ -234,7 +397,7 @@
         </div>
 
         <div class="section">
-            <h2>7. Cookies and Tracking</h2>
+            <h2><i class="fas fa-cookie"></i> 7. Cookies and Tracking</h2>
             
             <h3>7.1. Local Storage</h3>
             <ul>
@@ -248,32 +411,35 @@
         </div>
 
         <div class="section">
-            <h2>8. Children's Privacy</h2>
+            <h2><i class="fas fa-child"></i> 8. Children's Privacy</h2>
             <p>QueryBee is designed for use by college students and adults. We do not knowingly collect personal information from children under 13 years of age. If we become aware that we have collected such information, we will take steps to delete it.</p>
         </div>
 
         <div class="section">
-            <h2>9. International Data Transfers</h2>
+            <h2><i class="fas fa-globe"></i> 9. International Data Transfers</h2>
             <p>Your information may be processed and stored on servers outside your country. We ensure appropriate safeguards are in place to protect your data in accordance with applicable data protection laws.</p>
         </div>
 
         <div class="section">
-            <h2>10. Changes to This Policy</h2>
+            <h2><i class="fas fa-sync-alt"></i> 10. Changes to This Policy</h2>
             <p>We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last Updated" date.</p>
         </div>
 
         <div class="section">
-            <h2>11. Contact Information</h2>
+            <h2><i class="fas fa-envelope"></i> 11. Contact Information</h2>
             <p>If you have questions about this Privacy Policy or how we handle your information, please contact us:</p>
-            <ul>
-                <li><strong>Email:</strong> info@mldahanukarcollege.edu.in</li>
-                <li><strong>Phone:</strong> +91 22 2614 4321</li>
-                <li><strong>Address:</strong> M. L. Dahanukar College of Commerce, Vile Parle (West), Mumbai - 400056</li>
-            </ul>
+            
+            <div class="contact-info">
+                <ul>
+                    <li><strong>Email:</strong> info@mldahanukarcollege.edu.in</li>
+                    <li><strong>Phone:</strong> +91 22 2614 4321</li>
+                    <li><strong>Address:</strong> M. L. Dahanukar College of Commerce, Vile Parle (West), Mumbai - 400056</li>
+                </ul>
+            </div>
         </div>
 
         <div class="section">
-            <h2>12. Consent</h2>
+            <h2><i class="fas fa-check-circle"></i> 12. Consent</h2>
             <p>By using QueryBee, you acknowledge that you have read, understood, and agree to this Privacy Policy.</p>
         </div>
 
