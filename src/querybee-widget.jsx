@@ -210,6 +210,82 @@ const THEME_PRESETS = [
       blur: 18,
     },
   },
+  {
+    id: 'rose-gold',
+    name: 'Rose Gold',
+    theme: {
+      mode: 'light',
+      accent: '351 83% 61%',
+      accentFg: '0 0% 100%',
+      bg: '0 0% 100%',
+      fg: '240 10% 8%',
+      card: '351 20% 97%',
+      border: '351 30% 88%',
+      muted: '351 15% 94%',
+      mutedFg: '240 8% 46%',
+      radius: '20px',
+      font: DEFAULT_THEME.font,
+      glass: 0.88,
+      blur: 12,
+    },
+  },
+  {
+    id: 'cyberpunk',
+    name: 'Cyberpunk',
+    theme: {
+      mode: 'dark',
+      accent: '318 100% 54%',
+      accentFg: '0 0% 0%',
+      bg: '240 10% 4%',
+      fg: '0 0% 100%',
+      card: '240 10% 8%',
+      border: '318 100% 54%',
+      muted: '240 10% 12%',
+      mutedFg: '240 5% 65%',
+      radius: '12px',
+      font: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace',
+      glass: 0.85,
+      blur: 8,
+    },
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    theme: {
+      mode: 'dark',
+      accent: '142 76% 36%',
+      accentFg: '0 0% 100%',
+      bg: '120 15% 8%',
+      fg: '120 20% 95%',
+      card: '120 15% 12%',
+      border: '142 40% 25%',
+      muted: '120 15% 16%',
+      mutedFg: '120 10% 70%',
+      radius: '18px',
+      font: DEFAULT_THEME.font,
+      glass: 0.90,
+      blur: 16,
+    },
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender',
+    theme: {
+      mode: 'light',
+      accent: '270 81% 67%',
+      accentFg: '0 0% 100%',
+      bg: '270 20% 98%',
+      fg: '240 10% 15%',
+      card: '270 40% 96%',
+      border: '270 30% 85%',
+      muted: '270 25% 92%',
+      mutedFg: '240 8% 46%',
+      radius: '24px',
+      font: DEFAULT_THEME.font,
+      glass: 0.82,
+      blur: 20,
+    },
+  },
 ];
 
 function loadTheme() {
@@ -954,22 +1030,22 @@ export function QueryBeeWidget() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="border-t border-[hsl(var(--qb-border))] bg-[rgba(255,255,255,0.06)] px-3 py-2"
+                      className="border-t border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card)/0.5)] backdrop-blur-sm px-3 py-2"
                     >
                       <div className="flex flex-col gap-2">
                         {quick.map((q) => (
                           <div
                             key={q.id}
-                            className="flex items-center justify-between gap-2 rounded-[14px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 py-2"
+                            className="flex items-center justify-between gap-2 rounded-[14px] border border-[hsl(var(--qb-border))/0.5] bg-[hsl(var(--qb-card))/0.8] backdrop-blur-sm px-3 py-2 shadow-sm hover:bg-[hsl(var(--qb-card))/0.9] transition-colors"
                           >
                             <button
-                              className="flex-1 text-left text-[length:calc(var(--qb-font-size)-1px)] text-[hsl(var(--qb-fg))]"
+                              className="flex-1 text-left text-[length:calc(var(--qb-font-size)-1px)] text-[hsl(var(--qb-fg))] font-medium hover:text-[hsl(var(--qb-accent))] transition-colors"
                               onClick={() => sendMessage(q.text)}
                             >
                               {q.text}
                             </button>
                             <button
-                              className="grid h-7 w-7 place-items-center rounded-[12px] text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-muted))]"
+                              className="grid h-7 w-7 place-items-center rounded-[12px] text-[hsl(var(--qb-muted-fg))] hover:bg-[hsl(var(--qb-accent))] hover:text-[hsl(var(--qb-accent-fg))] transition-colors"
                               onClick={() => setQuick((prev) => prev.filter((x) => x.id !== q.id))}
                               title="Remove"
                             >
@@ -1289,18 +1365,26 @@ export function QueryBeeWidget() {
                             onChange={(e) => setTheme((p) => ({ ...p, font: e.target.value }))}
                             className="h-10 w-full rounded-[12px] border border-[hsl(var(--qb-border))] bg-[hsl(var(--qb-card))] px-3 text-sm"
                           >
-                            <option value={DEFAULT_THEME.font}>System</option>
-                            <option value="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Modern Sans</option>
+                            <option value="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">System</option>
                             <option value="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Inter</option>
                             <option value="Poppins, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Poppins</option>
                             <option value="Montserrat, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Montserrat</option>
                             <option value="Nunito, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Nunito</option>
                             <option value="DM Sans, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">DM Sans</option>
+                            <option value="Raleway, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Raleway</option>
+                            <option value="Oswald, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Oswald</option>
                             <option value="Playfair Display, ui-serif, Georgia, Cambria, Times New Roman, Times, serif">Playfair Display</option>
                             <option value="Roboto Slab, ui-serif, Georgia, Cambria, Times New Roman, Times, serif">Roboto Slab</option>
+                            <option value="Merriweather, ui-serif, Georgia, Cambria, Times New Roman, Times, serif">Merriweather</option>
+                            <option value="Lora, ui-serif, Georgia, Cambria, Times New Roman, Times, serif">Lora</option>
                             <option value="ui-serif, Georgia, Cambria, Times New Roman, Times, serif">Serif</option>
                             <option value="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace">Mono</option>
                             <option value="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace">JetBrains Mono</option>
+                            <option value="Fira Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace">Fira Code</option>
+                            <option value="Source Code Pro, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace">Source Code Pro</option>
+                            <option value="Caveat, cursive">Caveat</option>
+                            <option value="Dancing Script, cursive">Dancing Script</option>
+                            <option value="Pacifico, cursive">Pacifico</option>
                           </select>
                         </div>
 
