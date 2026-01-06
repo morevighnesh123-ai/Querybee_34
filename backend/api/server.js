@@ -110,6 +110,17 @@ app.get('/api/test', (req, res) => {
   res.json({ message: "Backend working fine!" });
 });
 
+app.get('/api/debug-env', (req, res) => {
+  res.json({
+    hasGoogleCreds: !!process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    googleCredsLength: process.env.GOOGLE_APPLICATION_CREDENTIALS ? process.env.GOOGLE_APPLICATION_CREDENTIALS.length : 0,
+    googleCredsStart: process.env.GOOGLE_APPLICATION_CREDENTIALS ? process.env.GOOGLE_APPLICATION_CREDENTIALS.startsWith('{') : false,
+    googleCredsPreview: process.env.GOOGLE_APPLICATION_CREDENTIALS ? process.env.GOOGLE_APPLICATION_CREDENTIALS.substring(0, 100) + '...' : 'undefined',
+    projectId: process.env.DIALOGFLOW_PROJECT_ID,
+    env: process.env.VERCEL ? 'vercel' : 'local'
+  });
+});
+
 app.get('/api/token', async (req, res) => {
   try {
     const token = await getAccessToken();
