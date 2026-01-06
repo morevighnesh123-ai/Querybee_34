@@ -663,49 +663,6 @@ export function QueryBeeWidget() {
     };
   }
 
-  function getPanelPosition(bubblePos, panelSize) {
-    if (!bubblePos || !panelSize) return { left: 16, top: 'auto', bottom: 64 };
-    
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const bubbleCenterX = bubblePos.x + 28; // Half of bubble width (56)
-    
-    // Check if bubble is on the right side of viewport
-    const isRightSide = bubbleCenterX > viewportWidth / 2;
-    
-    // Calculate panel position to align with bubble while staying in viewport
-    if (isRightSide) {
-      // Position panel at right edge, aligned with bubble right edge
-      const bubbleRight = bubblePos.x + 56;
-      const maxPanelRight = viewportWidth - 16; // 16px padding from right edge
-      const panelRight = Math.min(bubbleRight, maxPanelRight);
-      const rightPos = viewportWidth - panelRight;
-      
-      // Ensure panel doesn't go off left edge either
-      const panelLeft = viewportWidth - panelRight - panelSize.w;
-      const adjustedRight = panelLeft < 16 ? viewportWidth - (panelSize.w + 16) : rightPos;
-      
-      return { 
-        left: 'auto', 
-        right: `${adjustedRight}px`, 
-        top: 'auto', 
-        bottom: `${viewportHeight - bubblePos.y + 8}px`
-      };
-    } else {
-      // Position panel at left edge, aligned with bubble left edge
-      const bubbleLeft = bubblePos.x;
-      const maxPanelLeft = viewportWidth - panelSize.w - 16; // Maximum left position
-      const panelLeft = Math.min(Math.max(bubbleLeft, 16), maxPanelLeft);
-      
-      return { 
-        left: `${panelLeft}px`, 
-        right: 'auto', 
-        top: 'auto', 
-        bottom: `${viewportHeight - bubblePos.y + 8}px`
-      };
-    }
-  }
-
   function clearChat() {
     if (!messages.length) {
       setMessages([]);
@@ -898,16 +855,16 @@ export function QueryBeeWidget() {
               variants={panelVariants}
               transition={{ type: 'spring', stiffness: 380, damping: 32 }}
               className={cn(
-                'qb-motion absolute flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
+                'qb-motion absolute left-0 flex flex-col overflow-hidden rounded-[var(--qb-radius)] border border-[hsl(var(--qb-border))] text-[hsl(var(--qb-fg))] shadow-[0_20px_60px_rgba(0,0,0,0.25)]',
                 'bg-[hsl(var(--qb-bg)/var(--qb-glass))] backdrop-blur-[var(--qb-blur)]',
-                expanded ? 'fixed inset-0 rounded-none z-[10000]' : ''
+                expanded ? 'fixed inset-0 rounded-none z-[10000]' : 'bottom-16'
               )}
               style={
                 expanded
                   ? { overflow: 'hidden' }
                   : isTouchDevice
-                    ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))', ...getPanelPosition(pos, panelSize) }
-                    : { width: `${panelSize.w}px`, height: `${panelSize.h}px`, ...getPanelPosition(pos, panelSize) }
+                    ? { width: 'min(360px, calc(100vw - 24px))', height: 'min(520px, calc(100vh - 140px))' }
+                    : { width: `${panelSize.w}px`, height: `${panelSize.h}px` }
               }
             >
               <div className="relative">

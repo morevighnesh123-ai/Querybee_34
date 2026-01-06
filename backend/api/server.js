@@ -23,7 +23,7 @@ async function getAccessToken() {
   }
   
   if (!authClientPromise) {
-    const envCreds = process.env.GOOGLE_CREDS_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const envCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_CREDS_JSON;
     console.log('GOOGLE_APPLICATION_CREDENTIALS length:', envCreds ? envCreds.length : 'undefined');
     console.log('GOOGLE_APPLICATION_CREDENTIALS first 100 chars:', envCreds ? envCreds.slice(0, 100) : 'undefined');
     if (!envCreds) {
