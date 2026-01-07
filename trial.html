@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueryBee Widget Trial</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .demo-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .integration-info {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .integration-info h2 {
+            color: #00a8cc;
+            margin-top: 0;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .step {
+            margin: 20px 0;
+            padding-left: 20px;
+            border-left: 3px solid #00a8cc;
+        }
+        
+        .step h3 {
+            margin: 0 0 10px 0;
+            color: #0077be;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-box">
+            <h1>QueryBee Widget Demo</h1>
+            <p>This is a demonstration page showing the QueryBee chatbot widget in action.</p>
+            <p>Look for the chat button in the bottom-right corner of this page!</p>
+        </div>
+        
+        <div class="integration-info">
+            <h2>🚀 How to Integrate QueryBee Widget on Any Website</h2>
+            
+            <div class="step">
+                <h3>Step 1: Simple Integration (Recommended)</h3>
+                <p>Add this single line to your HTML file (before closing &lt;/body&gt; tag):</p>
+                <div class="code-block">
+&lt;script src="https://query-bee-mauve.vercel.app/widget-standalone.js"&gt;&lt;/script&gt;
+                </div>
+                <p><strong>That's it! The widget will automatically appear on your website.</strong></p>
+            </div>
+            
+            <div class="step">
+                <h3>Step 2: Alternative Method (Full Control)</h3>
+                <p>If you want more control, add both styles and script:</p>
+                <div class="code-block">
+&lt;!-- QueryBee Widget Styles --&gt;
+&lt;link rel="stylesheet" href="https://query-bee-mauve.vercel.app/widget-styles.css"&gt;
+
+&lt;!-- QueryBee Widget Script --&gt;
+&lt;script src="https://query-bee-mauve.vercel.app/widget-standalone.js"&gt;&lt;/script&gt;
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 3: Platform-Specific Instructions</h3>
+                
+                <p><strong>WordPress:</strong></p>
+                <div class="code-block">
+<!-- Add to WordPress Theme Footer or Custom HTML Widget -->
+<script src="https://query-bee-mauve.vercel.app/widget-standalone.js"></script>
+                </div>
+                
+                <p><strong>React/Next.js:</strong></p>
+                <div class="code-block">
+// Add to your layout component (e.g., _document.js or Layout.js)
+import Script from 'next/script';
+
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+      <Script 
+        src="https://query-bee-mauve.vercel.app/widget-standalone.js" 
+        strategy="afterInteractive"
+      />
+    </>
+  );
+}
+                </div>
+                
+                <p><strong>HTML/CSS Website:</strong></p>
+                <div class="code-block">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Website</title>
+</head>
+<body>
+    <!-- Your website content here -->
+    
+    <!-- QueryBee Widget -->
+    <script src="https://query-bee-mauve.vercel.app/widget-standalone.js"></script>
+</body>
+</html>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 4: Widget Features</h3>
+                <ul>
+                    <li>✅ <strong>Floating Chat Button</strong> - Appears in bottom-right corner</li>
+                    <li>✅ <strong>Expandable Chat Window</strong> - Opens on click, closes on X button</li>
+                    <li>✅ <strong>Real-time Chat</strong> - Connects to Dialogflow backend</li>
+                    <li>✅ <strong>Responsive Design</strong> - Works on mobile and desktop</li>
+                    <li>✅ <strong>Auto-positioning</strong> - Smart positioning to avoid overlap</li>
+                    <li>✅ <strong>Typing Indicators</strong> - Shows when bot is thinking</li>
+                    <li>✅ <strong>Error Handling</strong> - Graceful error messages</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3>Step 5: Customization Options</h3>
+                <p>You can customize the widget appearance by adding CSS variables:</p>
+                <div class="code-block">
+&lt;style&gt;
+:root {
+  --qb-primary: #00a8cc;    /* Change primary color */
+  --qb-secondary: #0077be;  /* Change secondary color */
+  --qb-size: 60px;          /* Change button size */
+}
+&lt;/style&gt;
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 6: Requirements & Notes</h3>
+                <ul>
+                    <li>📡 <strong>Internet Connection</strong> - Widget needs internet to connect to backend</li>
+                    <li>🔐 <strong>CORS Enabled</strong> - Backend already configured for cross-origin requests</li>
+                    <li>📱 <strong>Modern Browsers</strong> - Works on Chrome, Firefox, Safari, Edge</li>
+                    <li>⚡ <strong>Lightweight</strong> - Minimal impact on page load speed</li>
+                    <li>🔧 <strong>No Dependencies</strong> - Standalone, no other libraries needed</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3>Step 7: Troubleshooting</h3>
+                <p><strong>If widget doesn't appear:</strong></p>
+                <ul>
+                    <li>Check browser console for errors</li>
+                    <li>Ensure script URL is correct and accessible</li>
+                    <li>Verify no JavaScript conflicts on your page</li>
+                    <li>Try clearing browser cache</li>
+                </ul>
+                
+                <p><strong>If chat doesn't work:</strong></p>
+                <ul>
+                    <li>Check if backend API is running</li>
+                    <li>Verify network connectivity</li>
+                    <li>Check browser console for API errors</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QueryBee Widget - This is all you need to add! -->
+    <script src="https://query-bee-mauve.vercel.app/widget-standalone.js"></script>
+</body>
+</html>
