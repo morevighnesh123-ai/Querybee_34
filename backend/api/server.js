@@ -255,6 +255,20 @@ app.post('/api/dialogflow', async (req, res) => {
     });
   } catch (error) {
     console.error('Dialogflow error:', error);
+    
+    // Handle specific Dialogflow errors
+    if (error.response?.data?.error?.message?.includes('not found among intents')) {
+      // Fallback response for missing intents
+      const fallbackResponse = getFallbackResponse(userQuery);
+      return res.json({
+        sessionId,
+        query: userQuery,
+        response: fallbackResponse,
+        intent: 'fallback',
+        error: 'Intent not found - using fallback'
+      });
+    }
+    
     res.status(500).json({
       error: "Dialogflow API Error",
       response: error.response?.data?.error?.message || error.message,
@@ -263,6 +277,29 @@ app.post('/api/dialogflow', async (req, res) => {
     });
   }
 });
+
+// Fallback response function
+function getFallbackResponse(query) {
+  const lowerQuery = query.toLowerCase();
+  
+  // Admission related fallbacks
+  if (lowerQuery.includes('admission') || lowerQuery.includes('apply')) {
+    return "For admissions, please visit: https://enrollonline.co.in/Registration/Apply/MLDC or check our prospectus at https://www.mldcc.com/mldc/admission_dc.php";
+  }
+  
+  // Course related fallbacks
+  if (lowerQuery.includes('course') || lowerQuery.includes('programme')) {
+    return "We offer B.Com, B.Sc IT, B.A. Mass Media, and other UG programs. Visit https://www.mldcc.com/mldc/admission_dc.php for complete course list.";
+  }
+  
+  // Contact fallback
+  if (lowerQuery.includes('contact') || lowerQuery.includes('phone') || lowerQuery.includes('address')) {
+    return "Contact us at +91 22 2614 4321 or visit M.L. Dahanukar College, Vile Parle (West), Mumbai - 400056";
+  }
+  
+  // Default fallback
+  return "I'm having trouble connecting to my knowledge base. Please visit our website at https://www.mldcc.com/ or call us at +91 22 2614 4321 for assistance.";
+}
 
 module.exports = app;
 
