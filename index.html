@@ -315,7 +315,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="footer-logo">
-                        <img src="/QueryBeelogo.png" alt="MLDC Logo" style="width: 60px; height: 60px; border-radius: 8px;" />
+                        <img src="https://via.placeholder.com/60x60/4a90e2/ffffff?text=MLDC" alt="MLDC Logo" />
                         <h3>M. L. Dahanukar College</h3>
                         <p>of Commerce (Autonomous)</p>
                     </div>
@@ -374,6 +374,21 @@
 
     <script src="/script.js"></script>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 
 </html>

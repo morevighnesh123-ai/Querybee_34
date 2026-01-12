@@ -11,6 +11,13 @@ if (!process.env.VERCEL) {
   require('dotenv').config({ override: true });
 }
 
+// Course admission dates data
+const COURSES = {
+  'bsc it': { admissionDate: '12 June', title: 'B.Sc IT' },
+  'bcom': { admissionDate: '15 June', title: 'B.Com' },
+  'bca': { admissionDate: '10 June', title: 'BCA' }
+};
+
 // Auto token generation for REST API
 let cachedToken = null;
 let tokenExpiry = null;
@@ -216,6 +223,30 @@ app.post('/api/dialogflow', async (req, res) => {
 
     const result = response.data.queryResult;
     const reply = result.fulfillmentText || result.queryText || "Sorry, I didn't understand that.";
+    
+    // Check if query contains course information and provide custom response
+    const lowerQuery = userQuery.toLowerCase();
+    let courseInfo = null;
+    
+    // Check for course keywords in the query
+    for (const [courseKey, courseData] of Object.entries(COURSES)) {
+      if (lowerQuery.includes(courseKey)) {
+        courseInfo = courseData;
+        break;
+      }
+    }
+    
+    // If course found, provide custom response
+    if (courseInfo) {
+      return res.json({
+        sessionId,
+        query: userQuery,
+        response: `Admissions for ${courseInfo.title} start on ${courseInfo.admissionDate}. Would you like eligibility or fee details?`,
+        intent: result.intent?.displayName || 'course_admission',
+        courseInfo: courseInfo
+      });
+    }
+    
     res.json({
       sessionId,
       query: userQuery,
