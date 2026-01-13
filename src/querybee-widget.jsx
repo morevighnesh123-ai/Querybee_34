@@ -971,7 +971,10 @@ export function QueryBeeWidget() {
                                   : 'border-gray-300 bg-white text-gray-900'
                             )}
                           >
-                            <div className="text-[length:var(--qb-font-size)] leading-relaxed">{m.text}</div>
+                            <div 
+                              className="text-[length:var(--qb-font-size)] leading-relaxed"
+                              dangerouslySetInnerHTML={{ __html: m.text }}
+                            />
                             <div className="mt-2 flex items-center justify-between gap-2">
                               <div className={cn(
                                 'text-[10px] opacity-80',

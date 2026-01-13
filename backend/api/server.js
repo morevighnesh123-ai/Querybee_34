@@ -222,7 +222,10 @@ app.post('/api/dialogflow', async (req, res) => {
     }
 
     const result = response.data.queryResult;
-    const reply = result.fulfillmentText || result.queryText || "Sorry, I didn't understand that.";
+    let reply = result.fulfillmentText || result.queryText || "Sorry, I didn't understand that.";
+    
+    // Convert URLs in Dialogflow response to hyperlinks
+    reply = convertUrlsToHyperlinks(reply);
     
     // Check if query contains course information and provide custom response
     const lowerQuery = userQuery.toLowerCase();
@@ -236,12 +239,12 @@ app.post('/api/dialogflow', async (req, res) => {
       }
     }
     
-    // If course found, provide custom response
+    // If course found, provide custom response with hyperlinks
     if (courseInfo) {
       return res.json({
         sessionId,
         query: userQuery,
-        response: `Admissions for ${courseInfo.title} start on ${courseInfo.admissionDate}. Would you like eligibility or fee details?`,
+        response: `Admissions for ${courseInfo.title} start on ${courseInfo.admissionDate}. Would you like eligibility or fee details? <a href='https://enrollonline.co.in/Registration/Apply/MLDC' target='_blank' style='color: #3b82f6; text-decoration: underline;'>Apply Now</a>`,
         intent: result.intent?.displayName || 'course_admission',
         courseInfo: courseInfo
       });
@@ -284,21 +287,32 @@ function getFallbackResponse(query) {
   
   // Admission related fallbacks
   if (lowerQuery.includes('admission') || lowerQuery.includes('apply')) {
-    return "For admissions, please visit: https://enrollonline.co.in/Registration/Apply/MLDC or check our prospectus at https://www.mldcc.com/mldc/admission_dc.php";
+    return "For admissions, please visit: <a href='https://enrollonline.co.in/Registration/Apply/MLDC' target='_blank' style='color: #3b82f6; text-decoration: underline;'>Apply Online</a> or check our <a href='https://www.mldcc.com/mldc/admission_dc.php' target='_blank' style='color: #3b82f6; text-decoration: underline;'>prospectus</a>";
   }
   
   // Course related fallbacks
   if (lowerQuery.includes('course') || lowerQuery.includes('programme')) {
-    return "We offer B.Com, B.Sc IT, B.A. Mass Media, and other UG programs. Visit https://www.mldcc.com/mldc/admission_dc.php for complete course list.";
+    return "We offer B.Com, B.Sc IT, B.A. Mass Media, and other UG programs. Visit our <a href='https://www.mldcc.com/mldc/admission_dc.php' target='_blank' style='color: #3b82f6; text-decoration: underline;'>course catalog</a> for complete details.";
   }
   
   // Contact fallback
   if (lowerQuery.includes('contact') || lowerQuery.includes('phone') || lowerQuery.includes('address')) {
-    return "Contact us at +91 22 2614 4321 or visit M.L. Dahanukar College, Vile Parle (West), Mumbai - 400056";
+    return "Contact us at +91 22 2614 4321 or visit <a href='https://maps.google.com/?q=M.L.+Dahanukar+College,+Vile+Parle+(West),+Mumbai+-+400056' target='_blank' style='color: #3b82f6; text-decoration: underline;'>M.L. Dahanukar College, Vile Parle (West), Mumbai - 400056</a>";
   }
   
   // Default fallback
-  return "I'm having trouble connecting to my knowledge base. Please visit our website at https://www.mldcc.com/ or call us at +91 22 2614 4321 for assistance.";
+  return "I'm having trouble connecting to my knowledge base. Please visit our <a href='https://www.mldcc.com/' target='_blank' style='color: #3b82f6; text-decoration: underline;'>website</a> or call us at +91 22 2614 4321 for assistance.";
+}
+
+// Function to convert URLs in text to clickable hyperlinks
+function convertUrlsToHyperlinks(text) {
+  if (!text) return text;
+  
+  // Convert URLs to hyperlinks
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline; cursor: pointer;">${url}</a>`;
+  });
 }
 
 module.exports = app;
